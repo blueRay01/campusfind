@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 
 function Register() {
@@ -72,8 +73,8 @@ function Register() {
     </div>
     <div className="mt-lg text-center">
     <p className="font-body-sm text-body-sm text-secondary">
-                            Already have an account? 
-                            <a className="text-primary font-bold hover:underline" href="#">Sign In</a>
+    Already have an account?
+    <Link className="text-primary font-bold hover:underline" to="/"> Sign In</Link>
     </p>
     </div>
     </div>
