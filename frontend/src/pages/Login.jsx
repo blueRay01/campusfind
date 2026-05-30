@@ -1,11 +1,12 @@
 import React from "react"
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
     return (
         <div className="bg-background text-on-surface selection:bg-primary-fixed-dim min-h-screen flex flex-col">
         {/* <!-- TopNavBar (Shell Suppression: Hidden because Login is Transactional/Focused) -->
         <!-- Per instructions: Suppress navigation shell for Login/Sign-up/Transactional screens --> */}
-        <main classNameName="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl">
+        <main className="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl">
         <div className="max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
         {/* <!-- Hero Side (Desktop Only) --> */}
         <div className="hidden lg:flex flex-col gap-lg">
@@ -26,7 +27,7 @@ function Login() {
         </div>
         {/* <!-- Login Form Container --> */}
         <div className="flex justify-center lg:justify-end">
-        <div className="bg-surface-container-lowest border border-outline-variant p-xl rounded-xl soft-shadow w-full max-w-[440px] transition-all duration-300 hover:scale-[1.01]">
+        <div className="bg-surface-container-lowest border border-outline-variant p-xl rounded-xl soft-shadow w-full max-w-[440px] transition-all duration-300">
         <div className="text-center mb-xl lg:hidden">
         <span className="material-symbols-outlined text-primary text-4xl mb-sm" style= {{ fontVariationSettings: "'FILL' 1"}}>find_in_page</span>
         <h1 className="font-headline-lg text-headline-lg text-primary">CampusFind</h1>
@@ -63,7 +64,9 @@ function Login() {
         <div className="mt-xl text-center">
         <p className="font-body-sm text-body-sm text-on-surface-variant">
         Don't have an account yet?
-        <a className="text-primary font-semibold hover:underline decoration-2 underline-offset-4 ml-xs" href="#">Register</a>
+        <Link className="text-primary font-semibold hover:underline decoration-2 underline-offset-4 ml-xs" to="/register">
+          Register
+        </Link>
         </p>
         </div>
         </div>

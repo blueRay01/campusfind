@@ -5,12 +5,22 @@
 @tailwind utilities;
 
 .material-symbols-outlined {
-font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 body {
-font-family: 'Inter', sans-serif;
-background-color: #f7f9ff;
+    background-color: #f7f9ff;
+    font-family: 'Inter', sans-serif;
 }
-.soft-shadow {
-box-shadow: 0 10px 40px -10px rgba(0, 31, 63, 0.08);
+.form-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 10px 40px -10px rgba(0, 6, 19, 0.05);
+}
+.pill-input {
+    transition: all 0.2s ease-in-out;
+}
+.pill-input:focus {
+    outline: none;
+    border: 2px solid #000613;
+    background: #ffffff;
 }
