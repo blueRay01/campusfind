@@ -1,61 +1,61 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import useState from 'react';
 
 
 function Register() {
+    const [showPassword, setShowPassword] = useState(false);
     return (
         <div className="min-h-screen flex flex-col">
-    {/* <!-- Top Navigation Bar --> */}
-    <nav className="bg-surface dark:bg-inverse-surface flex justify-between items-center w-full px-margin-desktop h-16 border-b border-outline-variant dark:border-outline flat no shadows">
-    <div className="flex items-center gap-8">
-    <span className="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary">CampusFind</span>
-    </div>
-    <div className="flex items-center gap-md">
-    <button className="material-symbols-outlined text-primary dark:text-inverse-primary hover:bg-surface-container-high transition-colors duration-200 p-2 rounded-full" data-icon="notifications">notifications</button>
-    <button className="material-symbols-outlined text-primary dark:text-inverse-primary hover:bg-surface-container-high transition-colors duration-200 p-2 rounded-full" data-icon="account_circle">account_circle</button>
-    </div>
-    </nav>
     {/* <!-- Main Content --> */}
     <main className="flex-grow flex items-center justify-center py-xxl px-margin-mobile">
     <div className="w-full max-w-[540px]">
-    {/* <!-- Header Section --> */}
-    <div className="text-center mb-xl">
-    <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-fixed rounded-xl mb-md">
-    <span className="material-symbols-outlined text-[32px] text-primary" data-icon="person_add">person_add</span>
-    </div>
-    <h1 className="font-headline-lg text-headline-lg text-primary mb-xs">Registration (Desktop)</h1>
-    <p className="font-body-lg text-body-lg text-secondary">Join the institutional item network today.</p>
+    <div className="hidden lg:flex items-center justify-end flex-1">
+    <img
+        src="/illustrations/search.svg"
+        alt="Search illustration"
+        className="w-full max-w-[280px]"
+    />
     </div>
     {/* <!-- Registration Card --> */}
-    <div className="form-card rounded-xl p-xl">
-    <form action="#" className="space-y-lg" method="POST" onsubmit="event.preventDefault()">
+    <div className="bg-surface-container-lowest border border-outline-variant p-xl rounded-xl soft-shadow w-full max-w-[540px]">
+    <form className="space-y-lg" onSubmit={(e) => e.preventDefault()}>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
     {/* <!-- First Name --> */}
     <div className="space-y-xs">
     <label className="font-label-caps text-label-caps text-secondary px-sm">First Name</label>
-    <input className="pill-input w-full px-md py-md bg-surface-container-low border-0 rounded-full font-body-lg text-body-lg placeholder:text-outline-variant" placeholder="John" type="text"/>
+    <input className="w-full h-14 px-lg rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant" placeholder="John" type="text"/>
     </div>
-    {/* <!-- Age --> */}
+    {/* Course */}
     <div className="space-y-xs">
-    <label className="font-label-caps text-label-caps text-secondary px-sm">Age</label>
-    <input className="pill-input w-full px-md py-md bg-surface-container-low border-0 rounded-full font-body-lg text-body-lg placeholder:text-outline-variant" placeholder="21" type="number"/>
+    <label className="font-label-caps text-label-caps text-on-surface-variant px-sm">Course</label>
+    <input className="w-full h-14 px-lg rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all font-body-lg text-body-lg text-on-surface placeholder:text-outline/50" placeholder="e.g. BSCS" type="text"/>
     </div>
     </div>
     {/* <!-- Student ID No. --> */}
     <div className="space-y-xs">
     <label className="font-label-caps text-label-caps text-secondary px-sm">Student ID No.</label>
-    <input className="pill-input w-full px-md py-md bg-surface-container-low border-0 rounded-full font-body-lg text-body-lg placeholder:text-outline-variant" placeholder="STU-2024-001" type="text"/>
+    <input className="w-full h-14 px-lg rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant" placeholder="STU-2024-001" type="text"/>
     </div>
     {/* <!-- Email Address --> */}
     <div className="space-y-xs">
     <label className="font-label-caps text-label-caps text-secondary px-sm">Email Address</label>
-    <input className="pill-input w-full px-md py-md bg-surface-container-low border-0 rounded-full font-body-lg text-body-lg placeholder:text-outline-variant" placeholder="john.doe@university.edu" type="email"/>
+    <input className="w-full h-14 px-lg rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant" placeholder="john.doe@university.edu" type="email"/>
     </div>
     {/* <!-- Password --> */}           
     <div className="space-y-xs">
     <label className="font-label-caps text-label-caps text-secondary px-sm">Password</label>
     <div className="relative">
-    <input className="pill-input w-full px-md py-md bg-surface-container-low border-0 rounded-full font-body-lg text-body-lg placeholder:text-outline-variant" placeholder="••••••••" type="password"/>
-    <button className="absolute right-md top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="visibility" type="button">visibility</button>
+    <input className="w-full h-14 px-lg rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all font-body-lg text-body-lg text-on-surface placeholder:text-outline-variant" placeholder="••••••••" type="password"/>
+    <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+    >
+    <span className="material-symbols-outlined text-[20px]">
+        {showPassword ? "visibility_off" : "visibility"}
+    </span>
+    </button>
     </div>
     </div>
     {/* <!-- CTA --> */}
@@ -72,16 +72,10 @@ function Register() {
     </div>
     <div className="mt-lg text-center">
     <p className="font-body-sm text-body-sm text-secondary">
-                            Already have an account? 
-                            <a className="text-primary font-bold hover:underline" href="#">Sign In</a>
+    Already have an account?
+    <Link className="text-primary font-bold hover:underline" to="/"> Sign In</Link>
     </p>
     </div>
-    </div>
-    {/* <!-- Visual Decorative Element --> */}
-    <div className="mt-xl flex justify-center gap-gutter opacity-40">
-    <div className="w-12 h-12 bg-secondary-container rounded-lg"></div>
-    <div className="w-12 h-12 bg-primary-fixed rounded-full"></div>
-    <div className="w-12 h-12 bg-tertiary-fixed rounded-lg"></div>
     </div>
     </div>
     </main>

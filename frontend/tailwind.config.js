@@ -82,7 +82,8 @@ export default {
         "button": ["Inter"],
         "body-sm": ["Inter"],
         "headline-md": ["Inter"],
-        "headline-lg-mobile": ["Inter"]
+        "headline-lg-mobile": ["Inter"],
+        "syne": ["Syne", "sans-serif"],
       },
       fontSize: {
         "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
