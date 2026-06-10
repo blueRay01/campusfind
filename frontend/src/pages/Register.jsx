@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import useState from 'react';
+import { useState } from "react";
 
 
 function Register() {
@@ -9,7 +9,7 @@ function Register() {
         <div className="min-h-screen flex flex-col">
     {/* <!-- Main Content --> */}
     <main className="flex-grow flex items-center justify-center py-xxl px-margin-mobile">
-    <div className="w-full max-w-[540px]">
+    <div className="max-w-[1100px] w-full flex items-center justify-center gap-xxl">
     <div className="hidden lg:flex items-center justify-end flex-1">
     <img
         src="/illustrations/search.svg"
@@ -18,9 +18,9 @@ function Register() {
     />
     </div>
     {/* <!-- Registration Card --> */}
-    <div className="bg-surface-container-lowest border border-outline-variant p-xl rounded-xl soft-shadow w-full max-w-[540px]">
+    <div className="bg-surface-container-lowest border border-outline-variant p-xl rounded-xl soft-shadow w-full max-w-[440px]">
     <form className="space-y-lg" onSubmit={(e) => e.preventDefault()}>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+    <div className="grid grid-cols-1 gap-gutter">
     {/* <!-- First Name --> */}
     <div className="space-y-xs">
     <label className="font-label-caps text-label-caps text-secondary px-sm">First Name</label>
@@ -76,6 +76,14 @@ function Register() {
     <Link className="text-primary font-bold hover:underline" to="/"> Sign In</Link>
     </p>
     </div>
+    </div>
+    {/* Right illustration */}
+    <div className="hidden lg:flex items-center justify-start flex-1">
+    <img
+        src="/illustrations/found.svg"
+        alt="Found illustration"
+        className="w-full max-w-[280px]"
+    />
     </div>
     </div>
     </main>
