@@ -10,14 +10,15 @@ const app = express()
 //middleware
 app.use(cors())
 app.use(express.json())
-app.use('/auth', authRoutes)
-app.use('/posts', postRoutes)
-app.use('/claims', claimRoutes)
+
 
 //routes
 app.get('/health', (req, res) => {
     res.json({ status: 'ok'})
 })
 
+app.use('/auth', authRoutes)
+app.use('/posts', postRoutes)
+app.use('/claims', claimRoutes)
 
 module.exports = app
