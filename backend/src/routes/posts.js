@@ -3,6 +3,7 @@ const router = express.Router()
 const pool = require('../config/db')
 const authMiddleWare = require('../middleware/auth')
 const { post } = require('../app')
+const upload = require('../config/cloudinary')
 
 router.get('/', async(req,res) => {
     
@@ -31,12 +32,13 @@ router.get('/:id', async(req, res) =>{
     }
 })
 
-router.post('/', authMiddleWare, async(req, res) => {
+router.post('/', authMiddleWare, upload.single('image'), async(req, res) => {
     try {
         const id = req.user.id
         const { itemName, category, building, room, handedToSecurity } = req.body;
+        const image_url = req.file ? req.file.path : null
 
-        const newPost = await pool.query('INSERT INTO posts (user_id, title, category, building, room, status, handed_to_security) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [id, itemName, category, building, room, 'Found', handedToSecurity])
+        const newPost = await pool.query('INSERT INTO posts (user_id, title, category, building, room, image_url, status, handed_to_security) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, itemName, category, building, room, image_url, 'Found', handedToSecurity])
 
         res.status(200).json(newPost.rows[0])
     } catch (error) {
