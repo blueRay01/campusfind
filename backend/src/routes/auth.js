@@ -10,7 +10,7 @@ router.post('/register', async(req, res) => {
     const saltRounds = 10;
 
     try {
-    const { name, student_id, email, password } = req.body;
+    const { name, student_id, email, password, course } = req.body;
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email])
     if (existingUser.rows.length > 0) {
         return res.status(400).json({ message: 'Email already registered' })
@@ -18,7 +18,7 @@ router.post('/register', async(req, res) => {
 
     const hash = await bcrypt.hash(password, saltRounds)
 
-    await pool.query('INSERT INTO users (name, student_id, email, password) VALUES ($1, $2, $3, $4) RETURNING id, name, email', [name, student_id, email, hash])
+    await pool.query('INSERT INTO users (name, student_id, email, password, course) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email', [name, student_id, email, hash, course])
 
     res.status(201).json({ message: 'User registered successfully' })
 
