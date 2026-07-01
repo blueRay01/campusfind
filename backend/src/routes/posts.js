@@ -31,7 +31,7 @@ router.get('/my', authMiddleWare, async(req, res) => {
         console.error(error)
         res.status(500).json({ message: "Server error"})
     }
-})
+})  
 
 router.get('/:id', async(req, res) =>{
     try {
