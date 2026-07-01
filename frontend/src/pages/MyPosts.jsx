@@ -1,37 +1,10 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
-
-// Placeholder data — will come from backend later
-const myPosts = [
-  {
-    id: 1,
-    title: "Apple AirPods Case",
-    location: "Main Library, 2nd Floor",
-    date: "Oct 12, 2023",
-    status: "ACTIVE",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAZHSqbVNz3VzEfDKsxQWmdf1eoGpB1KlhsteWj1wNSvLU5iJyKIdJ95KEEia9jRXQaLujeSpiaanmzqhafcysFhO-hWYyi5rVP7XF5GyDbNfMuL1IPaANc7suWNWKk5jGTwhZsbJVuXjuzzpRgs6U333pXsJvRm-1pSGjkYFFW8q68ZZ6sjSb__m_e3ICteCn04cN68zMWThZNd50IMCdNysZnxebpqD-46XS7gAEMkNc2oWW4m168Y5xnFjDxwhV8ovSrFMfD0P4"
-  },
-  {
-    id: 2,
-    title: "Silver Dell Laptop",
-    location: "Engineering Hub, Room 402",
-    date: "Oct 10, 2023",
-    status: "ACTIVE",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCVq4sHQ9Dwy8TJxgWmrJCwc_3tAclAt0ejJUsUVN5NXS0N8f5hfM-3Y2vCWL4q04h3ORIdaqeqWEiEDe7DmcihMZuTOQ9zZJ5m0diQTl0S3VjAKljo_MC9rjrtE69MpgUrZSwJoGJtze7TY2n7iHcNrerBX6B1AU4XMageSDt6fA_96Mj7QbgeuQfwomI7LAN6NS_7gbNepaooGjXK9ZpQkLSbD3280PJ6H76EyMmsgB8hG66z-Zh9n1P9xGFnfv-tvv6emSIinF0"
-  },
-  {
-    id: 3,
-    title: "Keychain with Blue Fob",
-    location: "Student Union Cafeteria",
-    date: "Oct 05, 2023",
-    status: "RESOLVED",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDkVtEav8yPzutE4XcLBhaDM0Kc-ugC_xRkhECKDZDnhSfmzssJwe9oaoQxbBiHbqdgkPHLsciAP_BpgQKLMPTPUs_WbRNn0plkfRMI-YNKkE__KbBxtbk9MST3CHoT1DAHm1yo3EI0GsOcBuGNzKwqE41yaJ4J3FJcbIfO6AQxIK7bmtFhoCRGzlktq0-iMrXf-lC_AvQ0eubhyVFr0JRLk-YoV-mCfSXB2lX_2Mo17ozdSaYq93rutHXmVvd5lKGOFMeaK7ajJc0"
-  },
-]
+import api from "../api/axios"
 
 const stats = [
   { icon: "emoji_events", label: "Community Karma", value: "1,240 pts" },
@@ -43,9 +16,18 @@ function MyPosts() {
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState("Active")
+  const [posts, setPosts] = useState([])
 
-  const filteredPosts = myPosts.filter(post =>
-    activeTab === "Active" ? post.status === "ACTIVE" : post.status === "RESOLVED"
+  useEffect(() => {
+      const fetchPost = async () => {
+        const response = await api.get('/posts/my')
+        setPosts(response.data)
+      }
+      fetchPost()
+  }, [])
+
+  const filteredPosts = posts.filter(post =>
+    activeTab === "Active" ? post.is_resolved === false : post.is_resolved === true
   )
 
   return (
@@ -72,13 +54,13 @@ function MyPosts() {
                   onClick={() => setActiveTab("Active")}
                   className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Active" ? "bg-white shadow-sm text-primary" : "text-secondary hover:text-primary"}`}
                 >
-                  Active ({myPosts.filter(p => p.status === "ACTIVE").length})
+                  Active ({posts.filter(p => p.is_resolved === false).length})
                 </button>
                 <button
                   onClick={() => setActiveTab("Resolved")}
                   className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Resolved" ? "bg-white shadow-sm text-primary" : "text-secondary hover:text-primary"}`}
                 >
-                  Resolved ({myPosts.filter(p => p.status === "RESOLVED").length})
+                  Resolved ({posts.filter(p => p.is_resolved === true).length})
                 </button>
               </div>
             </div>
@@ -88,21 +70,21 @@ function MyPosts() {
               {filteredPosts.map(post => (
                 <div
                   key={post.id}
-                  className={`bg-white rounded-lg border border-surface-container-highest overflow-hidden hover:shadow-lg transition-all duration-300 group ${post.status === "RESOLVED" ? "opacity-80 hover:opacity-100" : ""}`}
+                  className={`bg-white rounded-lg border border-surface-container-highest overflow-hidden hover:shadow-lg transition-all duration-300 group ${post.is_resolved === true ? "opacity-80 hover:opacity-100" : ""}`}
                 >
                   {/* Image */}
-                  <div className={`relative h-48 overflow-hidden ${post.status === "RESOLVED" ? "grayscale group-hover:grayscale-0 transition-all duration-500" : ""}`}>
+                  <div className={`relative h-48 overflow-hidden ${post.is_resolved === true ? "grayscale group-hover:grayscale-0 transition-all duration-500" : ""}`}>
                     <img
-                      src={post.image}
+                      src={post.image_url}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute top-md left-md">
-                      <span className={`px-md py-1 text-[11px] font-bold uppercase tracking-wider rounded-full shadow-sm ${post.status === "ACTIVE" ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-secondary-container text-on-secondary-container"}`}>
-                        {post.status}
+                      <span className={`px-md py-1 text-[11px] font-bold uppercase tracking-wider rounded-full shadow-sm ${post.is_resolved === false ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-secondary-container text-on-secondary-container"}`}>
+                        {post.is_resolved ? "Resolved" : "Active"}
                       </span>
                     </div>
-                    {post.status === "RESOLVED" && (
+                    {post.is_resolved === true && (
                       <div className="absolute inset-0 bg-secondary/10 pointer-events-none" />
                     )}
                   </div>
@@ -113,7 +95,7 @@ function MyPosts() {
                       <h3 className="font-headline-md text-headline-md text-primary">{post.title}</h3>
                       <span className="text-secondary">
                         <span className="material-symbols-outlined text-[18px]">
-                          {post.status === "RESOLVED" ? "check_circle" : "more_vert"}
+                          {post.is_resolved === true ? "check_circle" : "more_vert"}
                         </span>
                       </span>
                     </div>
@@ -121,16 +103,16 @@ function MyPosts() {
                     <div className="flex flex-col gap-xs mb-lg">
                       <div className="flex items-center gap-xs text-secondary text-body-sm">
                         <span className="material-symbols-outlined text-[16px]">location_on</span>
-                        {post.location}
+                        {`${post.building}${post.room ? `, ${post.room}`:''}`}
                       </div>
                       <div className="flex items-center gap-xs text-secondary text-body-sm">
                         <span className="material-symbols-outlined text-[16px]">calendar_today</span>
-                        {post.date}
+                        {post.created_at}
                       </div>
                     </div>
 
                     {/* Actions */}
-                    {post.status === "ACTIVE" ? (
+                    {post.is_resolved === false ? (
                       <div className="grid grid-cols-3 gap-sm pt-md border-t border-surface-container-low">
                         <button className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn">
                           <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>

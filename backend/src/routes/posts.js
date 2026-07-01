@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const pool = require('../config/db')
 const authMiddleWare = require('../middleware/auth')
-const { post } = require('../app')
 const upload = require('../config/cloudinary')
 
 router.get('/', async(req,res) => {
@@ -10,12 +9,28 @@ router.get('/', async(req,res) => {
     try {
         const posts = await pool.query('SELECT * FROM posts')
         res.status(200).json(posts.rows)
-        
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: 'Not found.'})
     }
 
+})
+
+
+router.get('/my', authMiddleWare, async(req, res) => {
+    try {
+        const id = req.user.id
+        const post = await pool.query('SELECT * FROM posts WHERE user_id = $1', [id])
+
+        if (post.rows.length === 0) {
+            return res.status(404).json({ message: "No posts"})
+        } else {
+            res.status(200).json(post.rows)
+        }
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Server error"})
+    }
 })
 
 router.get('/:id', async(req, res) =>{

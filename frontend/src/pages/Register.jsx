@@ -11,9 +11,9 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [course, setCourse] = useState('');
-    const [success, setSuccess] = useState(false)
-    const navigate = useNavigate();
+    const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault()
