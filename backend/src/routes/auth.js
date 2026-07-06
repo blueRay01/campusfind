@@ -3,8 +3,24 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const pool = require('../config/db')
 const jwt = require('jsonwebtoken')
+const authMiddleWare = require('../middleware/auth')
 
+router.get('/my', authMiddleWare, async (req, res) => {
+    try {
+        const id = req.user.id
+        const user = await pool.query('SELECT name, student_id, email, course, created_at, messenger_link FROM users WHERE id = $1', [id])
 
+        if (user.rows.length === 0) {
+            return res.status(404).json({ message: "No user found."})
+        } else {
+            res.status(200).json(user.rows[0])
+        }
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Server error.'})
+    }
+    
+})
 
 router.post('/register', async(req, res) => {
     const saltRounds = 10;
@@ -18,13 +34,13 @@ router.post('/register', async(req, res) => {
 
     const hash = await bcrypt.hash(password, saltRounds)
 
-    await pool.query('INSERT INTO users (name, student_id, email, password, course) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email', [name, student_id, email, hash, course])
+    await pool.query('INSERT INTO users (name, student_id, email, password, course) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email', [name, student_id, email, hash, course]) 
 
     res.status(201).json({ message: 'User registered successfully' })
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({ message: 'Server error' })
+        res.status(500).json({ message: 'Server error.' })
     }
 })
 
@@ -56,6 +72,23 @@ router.post('/login', async(req, res) => {
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: 'Server error' })
+    }
+})
+
+router.patch('/my', authMiddleWare, async(req, res) => {
+    try {
+        const id = req.user.id
+        const { messenger_link } = req.body
+        const user = await pool.query('UPDATE users SET messenger_link = $1 WHERE id = $2 RETURNING messenger_link', [messenger_link, id])
+
+        if (user.rows.length === 0) {
+            return res.status(404).json({ message: "No user found."})
+        } else {
+            res.status(200).json(user.rows[0])
+        }
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Server error.'})
     }
 })
 
