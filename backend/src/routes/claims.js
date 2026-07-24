@@ -10,6 +10,8 @@ router.post('/', authMiddleware, async(req, res) => {
         const {post_id} = req.body
         const claim = await pool.query('INSERT INTO claims (post_id, claimant_id) VALUES ($1, $2) RETURNING *', [post_id, user_id] )
 
+        await pool.query('UPDATE posts SET is_claimed = true WHERE id = $1', [post_id])
+
         res.status(200).json(claim.rows[0])
     } catch (error) {
         console.error(error)
@@ -40,7 +42,6 @@ router.put('/:id', authMiddleware, async(req, res) => {
         } else {
             res.status(200).json(newStatus.rows[0])
         }
-
     } catch (error) {
         res.status(500).json({message: "Server error."})
     }

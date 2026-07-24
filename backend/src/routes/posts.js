@@ -3,17 +3,23 @@ const router = express.Router()
 const pool = require('../config/db')
 const authMiddleWare = require('../middleware/auth')
 const upload = require('../config/cloudinary')
+const optionalAuth = require('../middleware/optionalAuth')
 
-router.get('/', async(req,res) => {
+router.get('/', optionalAuth, async(req,res) => {
     
     try {
+        if (req.user) {
+            const posts = await pool.query('SELECT * FROM posts WHERE user_id != $1 ', [req.user.id])
+            return res.status(200).json(posts.rows)
+        }
+
         const posts = await pool.query('SELECT * FROM posts')
         res.status(200).json(posts.rows)
+        
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: 'Not found.'})
     }
-
 })
 
 
@@ -36,7 +42,7 @@ router.get('/my', authMiddleWare, async(req, res) => {
 router.get('/:id', async(req, res) =>{
     try {
         const { id } = req.params
-        const post = await pool.query('SELECT * FROM posts WHERE id = $1', [id])
+        const post = await pool.query('SELECT posts.*, users.name AS reporter_name, users.messenger_link AS messenger_link, users.email AS email FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id = $1', [id])
 
         if (post.rows.length === 0) {
             return res.status(404).json({ message: "No posts." });
