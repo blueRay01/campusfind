@@ -1,14 +1,54 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
+import api from "../api/axios"
+import { useAuth } from "../context/AuthContext"
 
 function ItemDetail() {
   const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
-  const [claimed, setClaimed] = useState(false)
+  const{ isLoggedIn, openLoginModal } = useAuth();
+  const {id} = useParams();
+  const [collapsed, setCollapsed] = useState(false);
+  const [claimed, setClaimed] = useState(false);
+  const [post, setPost] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await api.get(`/posts/${id}`)
+        setPost(response.data)
+        setClaimed(response.data.is_claimed)
+      } catch (err) {
+        setError("Failed to load this item. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPost()
+  }, [id])
+
+  const handleClaim = async () => {
+    try {
+
+      if (isLoggedIn) {
+        const claim = await api.post('/claims', { post_id : id } )
+        setClaimed(true)
+      } else {
+        openLoginModal()
+      }
+    } catch (err) {
+      setError("Failed to claim this item. Please try again.")
+    }
+  }
+
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>{error}</p>
 
   return (
     <div className="bg-background text-on-surface min-h-screen">
@@ -41,7 +81,7 @@ function ItemDetail() {
                 <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden flex flex-col">
                   <div className="relative h-[480px] w-full bg-secondary-container">
                     <img
-                      alt="Found Blue Water Bottle"
+                      alt={post.title}
                       className="h-full w-full object-cover"
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcREwoW-OVzxln2QspWodfOr6xxw8n7j9Z6Gpy4jWwQKRuvW9_NKg2m9tM852UgbLP5G9TZyKU_FnbGO_HtkpVKGxjoilNvTBAj06fHuzpKC2NoM9rfMhEX3nLhIvd_FeP9jjA12eFcQphjllxZgQSQmXxZMPjuq_5AWHIYOVMpZuTJp5anDU4UgWhCwE0KlQ2iLNIsAtpJ7nhyLghD6n8kgftn5QcsNpOjlRoRgDq76kub8ziZ5MSNOqM8oyDF1Rv7RrwRN8EjTc"
                     />
@@ -53,12 +93,11 @@ function ItemDetail() {
                   <div className="p-xl">
                     <div className="flex justify-between items-start mb-md">
                       <div>
-                        <h2 className="font-headline-lg text-headline-lg text-primary mb-xs">Ocean Blue HydroFlask</h2>
-                        <p className="text-on-surface-variant font-body-lg">Found yesterday at 2:15 PM</p>
+                        <h2 className="font-headline-lg text-headline-lg text-primary mb-xs ">{post.title}</h2>
+                        <p className="text-on-surface-variant font-body-lg">Found yesterday at {post.created_at}</p>
                       </div>
                       <div className="flex gap-sm flex-wrap justify-end">
-                        <span className="bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs rounded-full font-label-caps text-label-caps">PERSONAL CARE</span>
-                        <span className="bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs rounded-full font-label-caps text-label-caps">ACCESSORIES</span>
+                        <span className="bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs rounded-full font-label-caps text-label-caps">{post.category}</span>
                       </div>
                     </div>
 
@@ -80,8 +119,8 @@ function ItemDetail() {
                         <span className="material-symbols-outlined text-on-primary-fixed">location_on</span>
                       </div>
                       <div>
-                        <p className="font-headline-md text-headline-md text-primary">Engineering Hall</p>
-                        <p className="text-on-surface-variant font-body-sm">2nd Floor, Room 204 (Quiet Zone)</p>
+                        <p className="font-headline-md text-headline-md text-primary">{post.building}</p>
+                        <p className="text-on-surface-variant font-body-sm">{post.room}</p>
                       </div>
                     </div>
                   </div>
@@ -93,7 +132,7 @@ function ItemDetail() {
                         <span className="material-symbols-outlined text-secondary">person</span>
                       </div>
                       <div>
-                        <p className="font-headline-md text-headline-md text-primary">Alex Chen</p>
+                        <p className="font-headline-md text-headline-md text-primary">{post.reporter_name}</p>
                         <p className="text-on-surface-variant font-body-sm">Verified Student Finder</p>
                       </div>
                     </div>
@@ -126,7 +165,7 @@ function ItemDetail() {
 
                   {/* Claim button — changes when clicked */}
                   <button
-                    onClick={() => setClaimed(true)}
+                    onClick={handleClaim}
                     disabled={claimed}
                     className={`w-full py-lg rounded-full font-button text-button flex justify-center items-center gap-md transition-all active:scale-95 ${claimed ? "bg-surface-container-high text-on-surface-variant opacity-60 cursor-not-allowed" : "bg-primary text-on-primary hover:bg-primary-container"}`}
                   >
@@ -142,15 +181,11 @@ function ItemDetail() {
                     <div className="space-y-md">
                       <div className="flex justify-between items-center py-sm border-b border-on-primary-fixed/10">
                         <span className="text-on-primary-fixed-variant font-body-sm">Name</span>
-                        <span className="text-on-primary-fixed font-headline-md">Alex Chen</span>
+                        <span className="text-on-primary-fixed font-headline-md">{post.reporter_name}</span>
                       </div>
                       <div className="flex justify-between items-center py-sm border-b border-on-primary-fixed/10">
-                        <span className="text-on-primary-fixed-variant font-body-sm">Student ID</span>
-                        <span className="text-on-primary-fixed font-headline-md">#2940128</span>
-                      </div>
-                      <div className="flex justify-between items-center py-sm">
-                        <span className="text-on-primary-fixed-variant font-body-sm">Campus Email</span>
-                        <span className="text-on-primary-fixed font-headline-md">a.chen@university.edu</span>
+                        <span className="text-on-primary-fixed-variant font-body-sm">Messenger Link</span>
+                        <span className="text-on-primary-fixed font-headline-md">{post.messenger_link}</span>
                       </div>
                     </div>
                     <div className="mt-lg p-md bg-white/20 rounded-lg">

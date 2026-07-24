@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
+    const { login } = useAuth()
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -16,7 +18,7 @@ function Login() {
 
         try {
             const response = await api.post('/auth/login', {email, password})
-            localStorage.setItem('token', response.data.token)
+            login(response.data.token)
             navigate('/feed')
         } catch (error) {
             setError(error.response?.data?.message || 'Something went wrong. Try again.')

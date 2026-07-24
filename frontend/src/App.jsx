@@ -7,12 +7,17 @@ import MyPosts from "./pages/MyPosts"
 import MyClaims from "./pages/MyClaims"
 import ReportItem from "./pages/ReportItem"
 import Profile from "./pages/Profile"
+import LoginModal from "./components/LoginModal"
+import { useAuth } from "./context/AuthContext"
 
 function App() {
+  const { showLoginModal } = useAuth()
   return (
     <Router>
+      { showLoginModal && <LoginModal/>}
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Feed />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/item/:id" element={<ItemDetail />} />

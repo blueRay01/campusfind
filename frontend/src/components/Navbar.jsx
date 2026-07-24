@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 function NavBar() {
   const navigate = useNavigate()
+  const {isLoggedIn} = useAuth()
 
   return (
     <header className="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50">
@@ -27,9 +29,10 @@ function NavBar() {
           />
         </div>
       </div>
-
-      {/* Right — icons */}
-      <div className="flex items-center gap-4">
+{/* 
+      if (isLoggedIn) { */}
+          {/* Right — icons */}
+      {/* <div className="flex items-center gap-4">
         <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
           <span className="material-symbols-outlined">notifications</span>
         </button>
@@ -40,6 +43,13 @@ function NavBar() {
           <span className="material-symbols-outlined">account_circle</span>
         </button>
       </div>
+      } else {
+        return(
+          
+        )
+      } */}
+
+      
 
     </header>
   )
