@@ -11,10 +11,10 @@ import LoginModal from "./components/LoginModal"
 import { useAuth } from "./context/AuthContext"
 
 function App() {
-  const { showLoginModal } = useAuth()
+  const { authMode } = useAuth()
   return (
     <Router>
-      { showLoginModal && <LoginModal/>}
+      {authMode && <LoginModal/>}
       <Routes>
         <Route path="/" element={<Feed />} />
         <Route path="/login" element={<Login />} />

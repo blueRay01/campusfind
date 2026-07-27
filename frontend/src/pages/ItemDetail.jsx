@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext"
 
 function ItemDetail() {
   const navigate = useNavigate()
-  const{ isLoggedIn, openLoginModal } = useAuth();
+  const{ isLoggedIn, openAuthModal } = useAuth();
   const {id} = useParams();
   const [collapsed, setCollapsed] = useState(false);
   const [claimed, setClaimed] = useState(false);
@@ -40,7 +40,7 @@ function ItemDetail() {
         const claim = await api.post('/claims', { post_id : id } )
         setClaimed(true)
       } else {
-        openLoginModal()
+        openAuthModal('login')
       }
     } catch (err) {
       setError("Failed to claim this item. Please try again.")

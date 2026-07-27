@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 function NavBar() {
-  const navigate = useNavigate()
-  const {isLoggedIn} = useAuth()
+  const navigate = useNavigate();
+  const { isLoggedIn, openAuthModal } = useAuth();
 
   return (
     <header className="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50">
@@ -29,27 +29,34 @@ function NavBar() {
           />
         </div>
       </div>
-{/* 
-      if (isLoggedIn) { */}
-          {/* Right — icons */}
-      {/* <div className="flex items-center gap-4">
-        <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
-        <button
-          onClick={() => navigate("/profile")}
-          className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
-        >
-          <span className="material-symbols-outlined">account_circle</span>
-        </button>
-      </div>
-      } else {
-        return(
-          
-        )
-      } */}
 
-      
+      {/* Right — icons */}
+      <div className="flex items-center gap-4">
+      {isLoggedIn ? (
+        <>
+          <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
+            <span className="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            onClick={() => navigate("/profile")}
+            className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
+          >
+            <span className="material-symbols-outlined">account_circle</span>
+          </button>
+        </>
+      ) : (
+        <>
+          <button type="button" className="rounded-xl bg-on-primary-fixed text-white p-2 hover:bg-primary-container" onClick={() => {openAuthModal('register')}}>
+            Sign Up
+          </button>
+          <button type="button" className="rounded-xl bg-gray-200 p-2 hover:bg-gray-300" onClick={() => {openAuthModal('login')}}>
+            Log In
+          </button>
+        </>
+      )}
+
+        
+      </div>
 
     </header>
   )

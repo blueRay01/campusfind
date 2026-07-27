@@ -20,7 +20,7 @@ export default {
         "on-tertiary-fixed-variant": "#43474a",
         "error": "#ba1a1a",
         "surface-container-lowest": "#ffffff",
-        "on-primary-fixed": "#001c3a",
+        "on-primary-fixed": "#022a54",
         "surface-container": "#ebeef3",
         "on-secondary-fixed-variant": "#454748",
         "on-error": "#ffffff",

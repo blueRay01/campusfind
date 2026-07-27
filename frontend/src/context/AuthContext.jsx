@@ -4,12 +4,12 @@ const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
-  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [authMode, setAuthMode] = useState(null)
 
   const login = (token) => {
     localStorage.setItem('token', token)
     setIsLoggedIn(true)
-    setShowLoginModal(false)   // close modal automatically on successful login
+    setAuthMode(null)   // close modal automatically on successful login
   }
 
   const logout = () => {
@@ -17,11 +17,14 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false)
   }
 
-  const openLoginModal = () => setShowLoginModal(true)
-  const closeLoginModal = () => setShowLoginModal(false)
+  const openAuthModal = (mode) => {
+    setAuthMode(mode)
+  }
+
+  const closeAuthModal = () => setAuthMode(null)
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, showLoginModal, openLoginModal, closeLoginModal }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, authMode, openAuthModal, closeAuthModal }}>
       {children}
     </AuthContext.Provider>
   )
