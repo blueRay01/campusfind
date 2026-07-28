@@ -1,9 +1,24 @@
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { useState, useRef, useEffect } from "react";
 
 function NavBar() {
   const navigate = useNavigate();
-  const { isLoggedIn, openAuthModal } = useAuth();
+  const { isLoggedIn, openAuthModal, logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
 
   return (
     <header className="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50">
@@ -37,12 +52,21 @@ function NavBar() {
           <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
             <span className="material-symbols-outlined">notifications</span>
           </button>
-          <button
-            onClick={() => navigate("/profile")}
-            className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
-          >
-            <span className="material-symbols-outlined">account_circle</span>
-          </button>
+            <div className="relative" ref={dropdownRef}>
+              <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
+            >
+              <span className="material-symbols-outlined">account_circle</span>
+            </button>
+            {isOpen && (
+              <div className="absolute flex flex-col justify-center bg-gray-200 rounded-md">
+                <p className="p-2 cursor-pointer" onClick={() => navigate('/profile')}>Profile</p>
+                <p className="p-2 cursor-pointer" onClick={() => logout()}>Logout</p>
+              </div>
+            )}
+          </div>
+          
         </>
       ) : (
         <>
