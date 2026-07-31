@@ -175,7 +175,7 @@ function ItemDetail() {
                 </div>
 
                 {/* Finder info — only shows after claiming */}
-                {claimed && (
+                {claimed && isLoggedIn && (
                   <div className="bg-primary-fixed rounded-xl p-xl border-none">
                     <h3 className="font-label-caps text-label-caps text-on-primary-fixed mb-md">FINDER DETAILS FOR MEETUP</h3>
                     <div className="space-y-md">

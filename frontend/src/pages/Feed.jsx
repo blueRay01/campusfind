@@ -5,14 +5,17 @@ import ItemCard from "../components/ItemCard"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
+import { useAuth } from "../context/AuthContext"
 
 
 const categories = ["All Items", "Tech", "Documents", "Clothing"]
 
 function Feed() {
+  const { isLoggedIn } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [activeCategory, setActiveCategory] = useState("All Items")
   const [posts, setPosts] = useState([])
+  const visiblePosts = posts.filter(post => !post.is_claimed)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -20,18 +23,19 @@ function Feed() {
       setPosts(response.data)
     }
     fetchPosts()
-  }, [])
+  }, [isLoggedIn])
+  
 
   return (
     <div className="bg-background text-on-surface min-h-screen">
-
+      
       <NavBar />
 
       <div className="flex">
         <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
 
         {/* Main content — margin shifts when sidebar collapses */}
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
+        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${!isLoggedIn ? "" : collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
           <div className="max-w-[1100px] mx-auto">
 
             {/* Page header and category filters */}
@@ -55,7 +59,7 @@ function Feed() {
 
             {/* Cards grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg">
-              {posts.map(post => (
+              {visiblePosts.map(post => (
                 <ItemCard
                   key={post.id}
                   id={post.id} 
