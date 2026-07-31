@@ -1,8 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 function SideBar({ collapsed, setCollapsed }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isLoggedIn } = useAuth()
 
   const navItems = [
     { icon: "home", label: "Home", path: "/feed" },
@@ -11,7 +13,9 @@ function SideBar({ collapsed, setCollapsed }) {
   ]
 
   return (
-    <aside className={`hidden lg:flex flex-col h-[calc(100vh-64px)] fixed left-0 top-16 bg-surface text-on-surface border-r border-outline-variant pt-6 z-40 transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}>
+    <>
+        {isLoggedIn && (
+      <aside className={`hidden lg:flex flex-col h-[calc(100vh-64px)] fixed left-0 top-16 bg-surface text-on-surface border-r border-outline-variant pt-6 z-40 transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}>
 
       {/* Header */}
       <div className="px-6 mb-6 flex justify-between items-center">
@@ -59,6 +63,12 @@ function SideBar({ collapsed, setCollapsed }) {
       </div>
 
     </aside>
+    )
+
+    }
+    </>
+
+    
   )
 }
 
