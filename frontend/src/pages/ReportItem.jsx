@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
+import api from "../api/axios"
 
 const buildings = [
   "BLDG. 1 - Arts and Culture Building",
@@ -49,12 +50,13 @@ const categories = [
 ]
 
 function ReportItem() {
-  const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
-  const [preview, setPreview] = useState(null)
-  const [dragOver, setDragOver] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [handedToSecurity, setHandedToSecurity] = useState(false)
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [image, setImage] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [handedToSecurity, setHandedToSecurity] = useState(false);
+  const [error, setError] = useState('');
 
   // Form fields
   const [itemName, setItemName] = useState("")
@@ -65,6 +67,7 @@ function ReportItem() {
   const handleFileChange = (file) => {
     if (file) {
       setPreview(URL.createObjectURL(file))
+      setImage(file)
     }
   }
 
@@ -75,11 +78,26 @@ function ReportItem() {
     handleFileChange(file)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 4000)
+    const formData = new FormData()
+    formData.append('itemName', itemName)
+    formData.append('category', category)
+    formData.append('building', building)
+    formData.append('room', room)
+    formData.append('handedToSecurity', handedToSecurity)
+    formData.append('image', image)
+
+    try {
+      const response = await api.post('/posts', formData)
+      navigate('/feed')
+    } catch (error) {
+      setError('Failed to report item. Please try again')
+    }
+
   }
+
+  
 
   return (
     <div className="bg-background text-on-surface min-h-screen">
@@ -247,6 +265,7 @@ function ReportItem() {
                   >
                     Submit Report
                   </button>
+                  {error && <p className='text-red-500 text-sm'>{error}</p>}
                   <button
                     type="button"
                     onClick={() => navigate("/feed")}
@@ -262,15 +281,6 @@ function ReportItem() {
           </div>
         </main>
       </div>
-
-      {/* Success toast */}
-      {submitted && (
-        <div className="fixed bottom-lg right-lg bg-primary-container text-on-primary-container px-xl py-md rounded-full flex items-center gap-md shadow-xl z-50 transition-all duration-500">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-          <span className="font-button">Report Submitted Successfully!</span>
-        </div>
-      )}
-
       <Footer />
       <BottomNav />
 
