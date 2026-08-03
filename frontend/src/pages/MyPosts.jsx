@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
@@ -16,7 +16,18 @@ function MyPosts() {
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState("Active")
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState([]);
+
+  const handleResolve = async (postId) => {
+    try {
+      await api.patch(`/posts/${postId}/resolve`)
+      setPosts(posts.map(post => 
+        post.id === postId ? {...post, is_resolved: true} : post
+      ))
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   useEffect(() => {
       const fetchPost = async () => {
@@ -113,22 +124,33 @@ function MyPosts() {
 
                     {/* Actions */}
                     {post.is_resolved === false ? (
-                      <div className="grid grid-cols-3 gap-sm pt-md border-t border-surface-container-low">
-                        <button className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn">
-                          <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>
-                          <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">EDIT</span>
-                        </button>
-                        <button className="flex flex-col items-center gap-1 py-sm hover:bg-error-container rounded-lg transition-colors group/btn">
-                          <span className="material-symbols-outlined text-secondary group-hover/btn:text-error">delete</span>
-                          <span className="text-[10px] font-bold text-secondary group-hover/btn:text-error">DELETE</span>
-                        </button>
-                        <button
-                          onClick={() => navigate(`/item/${post.id}`)}
-                          className="flex flex-col items-center gap-1 py-sm hover:bg-primary-fixed rounded-lg transition-colors group/btn"
-                        >
-                          <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">visibility</span>
-                          <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">DETAILS</span>
-                        </button>
+                      <div className="pt-md border-t border-surface-container-low flex flex-col gap-sm">
+                        {post.is_claimed && (
+                          <button
+                            onClick={() => handleResolve(post.id)}
+                            className="w-full py-sm bg-primary text-on-primary rounded-lg font-button text-button hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                            Confirm Handoff
+                          </button>
+                        )}
+                        <div className="grid grid-cols-3 gap-sm">
+                          <button className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn">
+                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>
+                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">EDIT</span>
+                          </button>
+                          <button className="flex flex-col items-center gap-1 py-sm hover:bg-error-container rounded-lg transition-colors group/btn">
+                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-error">delete</span>
+                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-error">DELETE</span>
+                          </button>
+                          <button
+                            onClick={() => navigate(`/item/${post.id}`)}
+                            className="flex flex-col items-center gap-1 py-sm hover:bg-primary-fixed rounded-lg transition-colors group/btn"
+                          >
+                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">visibility</span>
+                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">DETAILS</span>
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="pt-md border-t border-surface-container-low flex justify-center">

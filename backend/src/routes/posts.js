@@ -22,7 +22,6 @@ router.get('/', optionalAuth, async(req,res) => {
     }
 })
 
-
 router.get('/my', authMiddleWare, async(req, res) => {
     try {
         const id = req.user.id
@@ -68,10 +67,11 @@ router.post('/', authMiddleWare, upload.single('image'), async(req, res) => {
     }
 })
 
-router.patch('/:id/resolve', async(req, res) => {
+router.patch('/:id/resolve', authMiddleWare, async(req, res) => {
     try {
         const id = req.params.id
-        const updated_post = await pool.query('UPDATE posts SET is_resolved = true WHERE id = $1 RETURNING *', [id])
+        const user_id = req.user.id
+        const updated_post = await pool.query('UPDATE posts SET is_resolved = true WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id])
 
         if (updated_post.rows.length === 0) {
             return res.status(404).json({ message: "Post not found."})
