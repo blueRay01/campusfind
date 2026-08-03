@@ -62,7 +62,12 @@ function NavBar() {
             {isOpen && (
               <div className="absolute flex flex-col justify-center bg-gray-200 rounded-md">
                 <p className="p-2 cursor-pointer" onClick={() => navigate('/profile')}>Profile</p>
-                <p className="p-2 cursor-pointer" onClick={() => logout()}>Logout</p>
+                <p className="p-2 cursor-pointer" onClick={() => {
+                  logout()
+                  navigate('/feed')
+                }
+                 
+                  }>Logout</p>
               </div>
             )}
           </div>
