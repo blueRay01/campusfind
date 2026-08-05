@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
@@ -63,6 +63,16 @@ function ReportItem() {
   const [category, setCategory] = useState("")
   const [building, setBuilding] = useState("")
   const [room, setRoom] = useState("")
+  const [pickupLocation, setPickupLocation] = useState("")
+  const [description, setDescription] = useState("")
+
+  // Clear pickup location whenever "handed to security" gets checked,
+  // so no stale text is submitted alongside the disabled field
+  useEffect(() => {
+    if (handedToSecurity) {
+      setPickupLocation("")
+    }
+  }, [handedToSecurity])
 
   const handleFileChange = (file) => {
     if (file) {
@@ -86,7 +96,9 @@ function ReportItem() {
     formData.append('building', building)
     formData.append('room', room)
     formData.append('handedToSecurity', handedToSecurity)
+    formData.append('pickupLocation', pickupLocation)
     formData.append('image', image)
+    formData.append('description', description)
 
     try {
       const response = await api.post('/posts', formData)
@@ -153,6 +165,17 @@ function ReportItem() {
                       </select>
                     </div>
 
+                    <div>
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">DESCRIPTION (OPTIONAL)</label>
+                      <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Any distinguishing details — color, brand, stickers, condition, etc."
+                        rows={4}
+                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-2xl font-body-lg focus:ring-2 focus:ring-primary transition-all resize-none"
+                      />
+                    </div>
+
                   </div>
                 </div>
 
@@ -161,7 +184,7 @@ function ReportItem() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
 
                     <div className="md:col-span-2">
-                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">BUILDING</label>
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">WHERE ITEM WAS FOUND — BUILDING</label>
                       <select
                         value={building}
                         onChange={(e) => setBuilding(e.target.value)}
@@ -198,6 +221,20 @@ function ReportItem() {
                           Handed to Security / Guard
                         </span>
                       </label>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">
+                        PICKUP LOCATION {handedToSecurity ? "(not needed — handed to security)" : "(optional)"}
+                      </label>
+                      <input
+                        type="text"
+                        value={pickupLocation}
+                        onChange={(e) => setPickupLocation(e.target.value)}
+                        disabled={handedToSecurity}
+                        placeholder="e.g. Meet at the Library entrance, 3rd Floor Lounge"
+                        className={`w-full px-md py-sm border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all ${handedToSecurity ? "bg-surface-container-highest text-on-surface-variant cursor-not-allowed" : "bg-surface-container-low"}`}
+                      />
                     </div>
 
                   </div>
