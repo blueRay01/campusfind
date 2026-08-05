@@ -6,12 +6,6 @@ import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
 
-const stats = [
-  { icon: "emoji_events", label: "Community Karma", value: "1,240 pts" },
-  { icon: "handshake", label: "Successful Returns", value: "15 Items" },
-  { icon: "verified", label: "Account Status", value: "Verified Student" },
-]
-
 function MyPosts() {
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
@@ -191,21 +185,6 @@ function MyPosts() {
                   Report a New Item
                 </button>
               </div>
-            </div>
-
-            {/* Stats section */}
-            <div className="mt-xxl grid grid-cols-1 md:grid-cols-3 gap-lg">
-              {stats.map(stat => (
-                <div key={stat.label} className="bg-surface-container-low p-xl rounded-lg border border-surface-container-highest flex items-center gap-lg">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-primary">{stat.icon}</span>
-                  </div>
-                  <div>
-                    <p className="text-label-caps text-secondary uppercase">{stat.label}</p>
-                    <p className="font-headline-md text-headline-md text-primary">{stat.value}</p>
-                  </div>
-                </div>
-              ))}
             </div>
 
           </div>
