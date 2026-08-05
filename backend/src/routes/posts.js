@@ -88,11 +88,12 @@ router.patch('/:id/resolve', authMiddleWare, async(req, res) => {
     } 
 })
 
-router.delete('/:id', async(req, res) => {
+router.delete('/:id', authMiddleWare, async(req, res) => {
     const id = req.params.id 
+    const user_id = req.user.id
 
     try {
-        const deleted_posts = await pool.query('DELETE FROM posts WHERE id = $1 RETURNING *', [id]) 
+        const deleted_posts = await pool.query('DELETE FROM posts WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]) 
 
         if (deleted_posts.rows.length === 0) {
             return res.status(404).json({ message : "Post not found."})

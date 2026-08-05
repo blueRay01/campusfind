@@ -29,6 +29,18 @@ function MyPosts() {
     }
   }
 
+  const handleDelete = async (postId) => {
+  const confirmed = window.confirm("Are you sure you want to delete this post? This cannot be undone.")
+  if (!confirmed) return
+
+  try {
+    await api.delete(`/posts/${postId}`)
+    setPosts(posts.filter(post => post.id !== postId))
+  } catch (err) {
+    console.error(err)
+  }
+}
+
   useEffect(() => {
       const fetchPost = async () => {
         const response = await api.get('/posts/my')
@@ -36,6 +48,7 @@ function MyPosts() {
       }
       fetchPost()
   }, [])
+
 
   const filteredPosts = posts.filter(post =>
     activeTab === "Active" ? post.is_resolved === false : post.is_resolved === true
@@ -139,7 +152,7 @@ function MyPosts() {
                             <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>
                             <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">EDIT</span>
                           </button>
-                          <button className="flex flex-col items-center gap-1 py-sm hover:bg-error-container rounded-lg transition-colors group/btn">
+                          <button onClick={() => handleDelete(post.id)} className="flex flex-col items-center gap-1 py-sm hover:bg-error-container rounded-lg transition-colors group/btn">
                             <span className="material-symbols-outlined text-secondary group-hover/btn:text-error">delete</span>
                             <span className="text-[10px] font-bold text-secondary group-hover/btn:text-error">DELETE</span>
                           </button>
