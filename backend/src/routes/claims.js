@@ -8,7 +8,7 @@ router.post('/', authMiddleware, async(req, res) => {
     try {
         const user_id = req.user.id
         const {post_id} = req.body
-        const claim = await pool.query('INSERT INTO claims (post_id, claimant_id) VALUES ($1, $2) RETURNING *', [post_id, user_id] )
+        const claim = await pool.query('INSERT INTO claims (post_id, claimant_id, status) VALUES ($1, $2, $3) RETURNING *', [post_id, user_id, 'pending'] )
 
         await pool.query('UPDATE posts SET is_claimed = true WHERE id = $1', [post_id])
 
@@ -22,7 +22,16 @@ router.post('/', authMiddleware, async(req, res) => {
 router.get('/my', authMiddleware, async(req, res) => {
     try {
         const id = req.user.id
-        const claim = await pool.query('SELECT * FROM claims WHERE claimant_id = $1', [id])
+        const claim = await pool.query(
+            `SELECT claims.id AS claim_id, claims.status, claims.created_at AS claimed_at,
+                    posts.id AS post_id, posts.title, posts.image_url, posts.building, posts.room,
+                    posts.pickup_location, posts.handed_to_security, posts.is_resolved
+             FROM claims
+             JOIN posts ON claims.post_id = posts.id
+             WHERE claims.claimant_id = $1
+             ORDER BY claims.created_at DESC`,
+            [id]
+        )
         res.status(200).json(claim.rows)
 
     } catch (error) {

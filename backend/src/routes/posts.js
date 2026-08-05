@@ -55,10 +55,13 @@ router.get('/:id', async(req, res) =>{
 router.post('/', authMiddleWare, upload.single('image'), async(req, res) => {
     try {
         const id = req.user.id
-        const { itemName, category, building, room, handedToSecurity } = req.body;
+        const { itemName, category, building, room, handedToSecurity, pickupLocation, description } = req.body;
         const image_url = req.file ? req.file.path : null
 
-        const newPost = await pool.query('INSERT INTO posts (user_id, title, category, building, room, image_url, status, handed_to_security) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, itemName, category, building, room, image_url, 'Found', handedToSecurity])
+        const newPost = await pool.query(
+            'INSERT INTO posts (user_id, title, category, building, room, image_url, status, handed_to_security, pickup_location, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            [id, itemName, category, building, room, image_url, 'Found', handedToSecurity, pickupLocation || null, description || null]
+        )
 
         res.status(200).json(newPost.rows[0])
     } catch (error) {
@@ -76,6 +79,7 @@ router.patch('/:id/resolve', authMiddleWare, async(req, res) => {
         if (updated_post.rows.length === 0) {
             return res.status(404).json({ message: "Post not found."})
         } else {
+            await pool.query('UPDATE claims SET status = $1 WHERE post_id = $2', ['resolved', id])
             res.status(200).json(updated_post.rows[0])
         }
     } catch (error) {
