@@ -59,11 +59,13 @@ router.put('/:id', authMiddleware, async(req, res) => {
 router.delete('/:id', authMiddleware, async(req, res) => {
     try {
         const id = req.params.id
-        const deleted = await pool.query('DELETE FROM claims WHERE id = $1 RETURNING *', [id])
+        const user_id = req.user.id
+        const deleted = await pool.query('DELETE FROM claims WHERE id = $1 AND claimant_id = $2 RETURNING *', [id, user_id])
         
         if (deleted.rows.length === 0) {
             return res.status(404).json({ message: "Claim not found."})
         } else {
+            await pool.query('UPDATE posts SET is_claimed = false WHERE id = $1', [deleted.rows[0].post_id])
             res.status(200).json({ message: "Claim removed."})
         }
         

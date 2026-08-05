@@ -12,6 +12,17 @@ function MyClaims() {
   const [claims, setClaims] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const handleCancelClaim = async (claimId) => {
+  const confirmed = window.confirm("Cancel this claim? The item will become available for others again.")
+  if (!confirmed) return
+
+  try {
+    await api.delete(`/claims/${claimId}`)
+    setClaims(claims.filter(claim => claim.claim_id !== claimId))
+  } catch (err) {
+    console.error(err)
+  }
+}
   useEffect(() => {
     const fetchClaims = async () => {
       try {
@@ -88,22 +99,32 @@ function MyClaims() {
                       </span>
                     </div>
 
-                    <div className="mt-auto pt-md border-t border-surface-container-highest">
-                      {claim.is_resolved ? (
+                    <div className="mt-auto pt-md border-t border-surface-container-highest flex flex-col gap-sm">
+                    {claim.is_resolved ? (
+                      <button
+                        onClick={() => navigate(`/item/${claim.post_id}`)}
+                        className="w-full py-sm bg-surface-variant text-on-surface-variant rounded-full font-label-caps text-[10px] uppercase hover:bg-surface-container-highest transition-all"
+                      >
+                        View Details
+                      </button>
+                    ) : (
+                      <>
+                        {claim.handed_to_security ? (
+                          <p className="font-body-sm text-secondary italic">Head to Campus Security to pick this up.</p>
+                        ) : claim.pickup_location ? (
+                          <p className="font-body-sm text-secondary italic">Pickup: {claim.pickup_location}</p>
+                        ) : (
+                          <p className="font-body-sm text-secondary italic">Awaiting finder confirmation.</p>
+                        )}
                         <button
-                          onClick={() => navigate(`/item/${claim.post_id}`)}
-                          className="w-full py-sm bg-surface-variant text-on-surface-variant rounded-full font-label-caps text-[10px] uppercase hover:bg-surface-container-highest transition-all"
+                          onClick={() => handleCancelClaim(claim.claim_id)}
+                          className="w-full py-sm bg-error-container text-error rounded-full font-label-caps text-[10px] uppercase hover:opacity-90 transition-all"
                         >
-                          View Details
+                          Cancel Claim
                         </button>
-                      ) : claim.handed_to_security ? (
-                        <p className="font-body-sm text-secondary italic">Head to Campus Security to pick this up.</p>
-                      ) : claim.pickup_location ? (
-                        <p className="font-body-sm text-secondary italic">Pickup: {claim.pickup_location}</p>
-                      ) : (
-                        <p className="font-body-sm text-secondary italic">Awaiting finder confirmation.</p>
-                      )}
-                    </div>
+                      </>
+                    )}
+                  </div>
                   </div>
                 ))}
 
