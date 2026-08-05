@@ -6,6 +6,7 @@ function NavBar() {
   const navigate = useNavigate();
   const { isLoggedIn, openAuthModal, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null)
 
   useEffect(() => {
@@ -19,6 +20,12 @@ function NavBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/feed?search=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   return (
     <header className="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50">
@@ -34,16 +41,18 @@ function NavBar() {
       </div>
 
       {/* Center — search bar */}
-      <div className="flex items-center gap-4 flex-1 max-w-md mx-8">
+      <form onSubmit={handleSearch} className="flex items-center gap-4 flex-1 max-w-md mx-8">
         <div className="relative w-full">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
           <input
             className="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-full border-none focus:ring-2 focus:ring-primary-container text-body-sm font-body-sm"
             placeholder="Search items, buildings..."
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </form>
 
       {/* Right — icons */}
       <div className="flex items-center gap-4">
