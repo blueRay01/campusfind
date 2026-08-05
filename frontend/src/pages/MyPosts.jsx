@@ -148,7 +148,10 @@ function MyPosts() {
                           </button>
                         )}
                         <div className="grid grid-cols-3 gap-sm">
-                          <button className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn">
+                          <button
+                            onClick={() => navigate(`/report/${post.id}`)}
+                            className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn"
+                          >
                             <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>
                             <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">EDIT</span>
                           </button>

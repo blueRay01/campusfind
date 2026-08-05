@@ -24,7 +24,9 @@ function App() {
         <Route path="/my-posts" element={<MyPosts />} />
         <Route path="/my-claims" element={<MyClaims />} />
         <Route path="/report" element={<ReportItem />} />
+        <Route path="/report/:id" element={<ReportItem />} />
         <Route path="/profile" element={<Profile />} />
+        
       </Routes>
     </Router>
   )

@@ -70,6 +70,34 @@ router.post('/', authMiddleWare, upload.single('image'), async(req, res) => {
     }
 })
 
+router.patch('/:id', authMiddleWare, upload.single('image'), async(req, res) => {
+    try {
+        const id = req.params.id
+        const user_id = req.user.id
+        const { itemName, category, building, room, handedToSecurity, pickupLocation, description } = req.body;
+
+        // Only update image_url if a new file was actually uploaded
+        const existing = await pool.query('SELECT image_url FROM posts WHERE id = $1 AND user_id = $2', [id, user_id])
+        if (existing.rows.length === 0) {
+            return res.status(404).json({ message: "Post not found." })
+        }
+        const image_url = req.file ? req.file.path : existing.rows[0].image_url
+
+        const updated = await pool.query(
+            `UPDATE posts 
+             SET title = $1, category = $2, building = $3, room = $4, image_url = $5, 
+                 handed_to_security = $6, pickup_location = $7, description = $8
+             WHERE id = $9 AND user_id = $10 RETURNING *`,
+            [itemName, category, building, room, image_url, handedToSecurity, pickupLocation || null, description || null, id, user_id]
+        )
+
+        res.status(200).json(updated.rows[0])
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Server error' })
+    }
+})
+
 router.patch('/:id/resolve', authMiddleWare, async(req, res) => {
     try {
         const id = req.params.id
