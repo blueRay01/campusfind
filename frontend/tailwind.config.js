@@ -19,9 +19,9 @@ export default {
         "surface-container-high": "#DEDFD6",
         "surface-container-highest": "#D3D4C9",
 
-        "primary": "#14140F",
+        "primary": "#252525",
         "on-primary": "#FFFFFF",
-        "primary-container": "#E7E8E1",
+        "primary-container": "#d7d8d1",
         "on-primary-container": "#14140F",
         "primary-fixed": "#E7E8E1",
         "primary-fixed-dim": "#D3D4C9",
@@ -75,7 +75,7 @@ export default {
         "xs": "4px",
         "sm": "8px",
         "margin-mobile": "20px",
-        "margin-desktop": "40px",
+        "margin-desktop": "60px",
         "base": "4px",
         "md": "16px",
         "gutter": "16px"
@@ -91,7 +91,7 @@ export default {
       },
       fontSize: {
         "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600"}],
-        "headline-lg": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+        "headline-lg": ["28px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
         "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
         "button": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
         "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],

@@ -23,39 +23,40 @@ function NavBar() {
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/feed?search=${encodeURIComponent(searchQuery.trim())}`)
+      navigate(`/feed?search=${encodeURIComponent(searchQuery.trim())}`) 
     }
   }
 
   return (
-    <header className="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50">
+    <header className="bg-surface flex justify-between items-center w-full p-margin-desktop h-15 sticky top-0 z-50 absolute ">
 
-      {/* Left — logo only */}
-      <div className="flex items-center">
+      {/* Left group — logo + search, close together */}
+      <div className="flex items-center gap-40 ml-24 flex-1">
         <span
           onClick={() => navigate("/feed")}
-          className="text-headline-md font-headline-md font-bold text-primary cursor-pointer"
+          className="text-headline-lg font-headline-md font-bold text-primary cursor-pointer"
         >
           CampusFind
         </span>
+
+        <form onSubmit={handleSearch} className="flex items-center w-full max-w-3xl">
+          <div className="relative w-4/5">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input
+              className="w-full pl-10 pr-4 py-2 bg-surface rounded-full border border-black focus:ring-2 focus:ring-primary-container text-body-sm font-body-sm"
+              placeholder="Search lost items..."
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </form>
       </div>
 
-      {/* Center — search bar */}
-      <form onSubmit={handleSearch} className="flex items-center gap-4 flex-1 max-w-md mx-8">
-        <div className="relative w-full">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input
-            className="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-full border-none focus:ring-2 focus:ring-primary-container text-body-sm font-body-sm"
-            placeholder="Search items, buildings..."
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </form>
+      
 
       {/* Right — icons */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-20 mr-20">
       {isLoggedIn ? (
         <>
           <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
@@ -84,10 +85,10 @@ function NavBar() {
         </>
       ) : (
         <>
-          <button type="button" className="rounded-xl bg-on-primary-fixed text-white p-2 hover:bg-primary-container" onClick={() => {openAuthModal('register')}}>
-            Sign Up
+          <button type="button" className="border border-black text-black-xs px-4 py-2 hover:bg-primary-container" onClick={() => {openAuthModal('register')}}>
+            Sign Up   
           </button>
-          <button type="button" className="rounded-xl bg-gray-200 p-2 hover:bg-gray-300" onClick={() => {openAuthModal('login')}}>
+          <button type="button" className="bg-black text-white px-4 py-2 hover:bg-primary" onClick={() => {openAuthModal('login')}}>
             Log In
           </button>
         </>
