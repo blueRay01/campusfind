@@ -20,64 +20,84 @@ const categories = [
   "Other",
 ]
 
+const sortOptions = [
+  { label: "Newest", value: "newest" },
+  { label: "Oldest", value: "oldest" },
+]
+
 function Feed() {
   const { isLoggedIn } = useAuth()
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('search') || ''
-  const [collapsed, setCollapsed] = useState(false)
   const [activeCategory, setActiveCategory] = useState("All Items")
+  const [sortBy, setSortBy] = useState("newest")
   const [posts, setPosts] = useState([])
+
 
   const visiblePosts = posts
     .filter(post => !post.is_claimed)
     .filter(post => activeCategory === "All Items" || post.category === activeCategory)
     .filter(post => post.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at)
+      const dateB = new Date(b.created_at)
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB
+    })
 
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await api.get('/posts')
-      setPosts(response.data)
+      setPosts(response.data)   
     }
     fetchPosts()
   }, [isLoggedIn])
   
 
-  return (
+ return (
     <div className="bg-background text-on-surface min-h-screen">
-      
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
-        {/* Main content — margin shifts when sidebar collapses */}
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${!isLoggedIn ? "" : collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
-          <div className="max-w-[1100px] mx-auto">
+        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
+          <div>
 
-            {/* Page header and category filter */}
+            {/* Page header and filters */}
             <header className="mb-xl flex justify-between items-end">
-              <div>
-                <h1 className="font-headline-lg text-headline-lg text-primary mb-sm">Campus Feed</h1>
-                <p className="font-body-lg text-body-lg text-on-surface-variant">
-                  {searchQuery ? `Showing results for "${searchQuery}"` : "Helping you reunite with your lost belongings."}
-                </p>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-md py-sm pr-10 bg-background border-none rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
+                >
+                  {sortOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined text-on-surface-variant absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[20px]">
+                  expand_more
+                </span>
               </div>
-              <div>
-                <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">CATEGORY</label>
+
+              <div className="relative">
                 <select
                   value={activeCategory}
                   onChange={(e) => setActiveCategory(e.target.value)}
-                  className="px-md py-sm bg-surface-container-high border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
+                  className="px-md py-sm pr-10 bg-background border-none rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
                 >
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
+                <span className="material-symbols-outlined text-on-surface-variant absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[20px]">
+                  expand_more
+                </span>
               </div>
             </header>
 
             {/* Cards grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xxl">
               {visiblePosts.map(post => (
                 <ItemCard
                   key={post.id}

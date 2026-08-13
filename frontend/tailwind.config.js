@@ -47,7 +47,7 @@ export default {
         "on-tertiary-fixed-variant": "#4A4940",
 
         "on-background": "#14140F",
-        "on-surface": "#14140F",
+        "on-surface": "#353534",
         "on-surface-variant": "#6B6A5F",
         "outline": "#8A8879",
         "outline-variant": "#D9DAD1",
@@ -82,19 +82,21 @@ export default {
       },
       fontFamily: {
         "label-caps": ["Manrope", "sans-serif"],
-        "headline-lg": ["Manrope", "sans-serif"],
+        "headline-lg": ["Poppins", "sans-serif"],
         "body-lg": ["Manrope", "sans-serif"],
         "button": ["Manrope", "sans-serif"],
         "body-sm": ["Manrope", "sans-serif"],
         "headline-md": ["Manrope", "sans-serif"],
-        "headline-lg-mobile": ["Manrope", "sans-serif"],
+        "headline-lg-mobile": ["Poppins", "sans-serif"],
+        "inter-bold": ["Inter", "sans-serif"],
+        "manrope-light": ["Manrope", "sans-serif"],
       },
       fontSize: {
         "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600"}],
-        "headline-lg": ["28px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
-        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+        "headline-lg": ["28px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
         "button": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
-        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
         "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
         "headline-lg-mobile": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
       }

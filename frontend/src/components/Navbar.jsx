@@ -28,13 +28,12 @@ function NavBar() {
   }
 
   return (
-    <header className="bg-surface flex justify-between items-center w-full p-margin-desktop h-15 sticky top-0 z-50 absolute ">
-
+    <header className="bg-surface flex justify-between items-center w-full pl-[150px] pr-[120px] min-h-[100px] sticky top-0 z-50 ">
       {/* Left group — logo + search, close together */}
-      <div className="flex items-center gap-40 ml-24 flex-1">
+      <div className="flex items-center gap-40 flex-1">
         <span
           onClick={() => navigate("/feed")}
-          className="text-headline-lg font-headline-md font-bold text-primary cursor-pointer"
+          className="font-headline-lg text-headline-lg text-primary cursor-pointer"
         >
           CampusFind
         </span>
@@ -60,14 +59,14 @@ function NavBar() {
       {isLoggedIn ? (
         <>
           <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
-            <span className="material-symbols-outlined">notifications</span>
+            <span className="material-symbols-outlined text-[30px]">notifications</span>
           </button>
             <div className="relative" ref={dropdownRef}>
               <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
             >
-              <span className="material-symbols-outlined">account_circle</span>
+              <span className="material-symbols-outlined text-[30px]">account_circle</span>
             </button>
             {isOpen && (
               <div className="absolute flex flex-col justify-center bg-gray-200 rounded-md">

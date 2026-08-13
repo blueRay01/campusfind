@@ -1,16 +1,16 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 function ItemCard({ id, title, location, image, category }) {
   const navigate = useNavigate()
 
   const badgeStyle = category === "LOST"
     ? "bg-error text-white"
-    : "bg-primary-container text-white"
+    : "bg-on-surface text-white"
 
   return (
-    <article className="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 cute-card-shadow transition-transform hover:-translate-y-1 duration-300">
+    <Link to={`/item/${id}`} className="bg-background cute-card-shadow transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)] duration-300">
 
-      <div className="relative mb-md h-48 rounded-lg overflow-hidden">
+      <div className="relative mb-md h-80 overflow-hidden">
         <img
           src={image}
           alt={title}
@@ -21,23 +21,16 @@ function ItemCard({ id, title, location, image, category }) {
         </span>
       </div>
 
-      <h3 className="font-headline-md text-headline-md text-primary mb-xs">
+      <h3 className="font-headline-md text-headline-md text-primary mb-xs uppercase">
         {title}
       </h3>
 
       <div className="flex items-center gap-2 text-on-surface-variant mb-md">
         <span className="material-symbols-outlined text-sm">location_on</span>
-        <span className="font-body-sm text-body-sm">{location}</span>
+        <span className="font-body-sm text-secondary">{location}</span>
       </div>
 
-      <button
-        onClick={() => navigate(`/item/${id}`)}
-        className="w-full bg-primary text-white py-2.5 rounded-full font-button text-button hover:bg-primary/90 transition-colors"
-      >
-        View Details
-      </button>
-
-    </article>
+    </Link>
   )
 }
 

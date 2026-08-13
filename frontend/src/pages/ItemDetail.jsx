@@ -15,13 +15,21 @@ function formatDate(dateString) {
 
 function ItemDetail() {
   const navigate = useNavigate()
-  const{ isLoggedIn, openAuthModal } = useAuth();
-  const {id} = useParams();
-  const [collapsed, setCollapsed] = useState(false);
-  const [claimed, setClaimed] = useState(false);
-  const [post, setPost] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { isLoggedIn, openAuthModal } = useAuth()
+  const { id } = useParams()
+  const [claimed, setClaimed] = useState(false)
+  const [post, setPost] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [descExpanded, setDescExpanded] = useState(false)
+
+  const DESCRIPTION_LIMIT = 220
+  const isLongDescription = post.description && post.description.length > DESCRIPTION_LIMIT
+  const displayedDescription =
+    isLongDescription && !descExpanded
+      ? post.description.slice(0, DESCRIPTION_LIMIT).trimEnd() + "…"
+      : post.description
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -41,9 +49,8 @@ function ItemDetail() {
 
   const handleClaim = async () => {
     try {
-
       if (isLoggedIn) {
-        const claim = await api.post('/claims', { post_id : id } )
+        await api.post('/claims', { post_id: id })
         setClaimed(true)
       } else {
         openAuthModal('login')
@@ -62,156 +69,155 @@ function ItemDetail() {
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar/>
 
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
-          <div className="max-w-[1200px] mx-auto">
+        <main className="flex-1 py-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
+          <div>
 
-            {/* Back button */}
-            <nav className="mb-lg">
-              <button
-                onClick={() => navigate("/feed")}
-                className="flex items-center text-on-surface-variant hover:text-primary transition-colors group"
-              >
-                <span className="material-symbols-outlined mr-xs group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                <span className="font-button text-button">Back to Feed</span>
-              </button>
-            </nav>
+            
 
-            <div className="grid grid-cols-12 gap-lg">
+            {/* Main split: image left, details right */}
+            <div className="flex flex-col lg:flex-row gap-40 pl-[150px]">
 
-              {/* Left column */}
-              <div className="col-span-12 lg:col-span-8 flex flex-col gap-lg">
+              {/* Left — image */}
+              <div className="w-full lg:w-[40%] shrink-0 flex flex-row items-start gap-lg">
+                {/* Back button */}
+                <button
+                  onClick={() => navigate("/feed")}
+                  className="flex items-center text-on-surface-variant hover:text-primary transition-colors group mb-xl"
+                >
+                  <span className="material-symbols-outlined mr-xs text-[30px] group-hover:-translate-x-1 transition-transform">chevron_left</span>
+                </button>
 
-                {/* Main item card */}
-                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden flex flex-col">
-                  <div className="relative h-[480px] w-full bg-secondary-container">
-                    <img
-                      alt={post.title}
-                      className="h-full w-full object-cover"
-                      src={post.image_url}
-                    />
-                    <div className="absolute top-lg right-lg">
-                      <span className="bg-primary text-on-primary px-lg py-sm rounded-full font-label-caps text-label-caps uppercase tracking-wider">FOUND</span>
-                    </div>
-                  </div>
-
-                  <div className="p-xl">
-                    <div className="flex justify-between items-start mb-md">
-                      <div>
-                        <h2 className="font-headline-lg text-headline-lg text-primary mb-xs ">{post.title}</h2>
-                        <p className="text-on-surface-variant font-body-lg">Found on {formatDate(post.created_at)}</p>
-                      </div>
-                      <div className="flex gap-sm flex-wrap justify-end">
-                        <span className="bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs rounded-full font-label-caps text-label-caps">{post.category}</span>
-                      </div>
-                    </div>
-
-                    {post.description && (
-                      <div className="space-y-md">
-                        <h3 className="font-headline-md text-headline-md text-primary">Description</h3>
-                        <p className="text-on-surface-variant font-body-lg leading-relaxed">
-                          {post.description}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Details bento row */}
-                <div className="grid grid-cols-2 gap-lg">
-                  <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col justify-center">
-                    <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-md">FOUND AT</h3>
-                    <div className="flex items-start gap-md">
-                      <div className="bg-primary-fixed p-sm rounded-lg">
-                        <span className="material-symbols-outlined text-on-primary-fixed">location_on</span>
-                      </div>
-                      <div>
-                        <p className="font-headline-md text-headline-md text-primary">{post.building}</p>
-                        <p className="text-on-surface-variant font-body-sm">{post.room}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col justify-center">
-                    <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-md">REPORTED BY</h3>
-                    <div className="flex items-center gap-md">
-                      <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center">
-                        <span className="material-symbols-outlined text-secondary">person</span>
-                      </div>
-                      <div>
-                        <p className="font-headline-md text-headline-md text-primary">{post.reporter_name}</p>
-                        <p className="text-on-surface-variant font-body-sm">Verified Student Finder</p>
-                      </div>
+                <div
+                  onClick={() => setLightboxOpen(true)}
+                  className="group relative h-72 lg:h-[500px] w-full overflow-hidden cursor-zoom-in bg-surface-container-high border border-black"
+                >
+                  <img
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    src={post.image_url}
+                  />
+                  {/* Hover overlay signaling the image is clickable */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                    <div className="flex items-center gap-xs px-md py-sm rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                      <span className="material-symbols-outlined text-[18px]">fullscreen</span>
+                      <span className="font-button text-button text-[13px]">View full size</span>
                     </div>
                   </div>
                 </div>
-
               </div>
 
-              {/* Right column */}
-              <div className="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+              {/* Right — details */}
+              <div className="flex-1 flex flex-col">
 
-                {/* Status card */}
-                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-xl flex flex-col">
-                  <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-lg uppercase tracking-widest">Current Status</h3>
-                  <div className="flex items-center gap-md mb-xl">
-                    <div className={`h-4 w-4 rounded-full ${post.is_resolved ? "bg-secondary" : "bg-primary animate-pulse"}`}></div>
-                    <span className="font-headline-md text-headline-md text-primary">
-                      {post.is_resolved ? "Resolved" : claimed ? "Pending Confirmation" : "Awaiting Claim"}
-                    </span>
+                <span className="font-label-caps text-label-caps text-black/60 uppercase tracking-wider mb-sm">
+                  {post.category} · FOUND
+                </span>
+
+                <h1 className="font-headline-lg text-headline-lg text-black uppercase mb-md">
+                  {post.title}
+                </h1>
+
+                <p className="text-black/60 font-body-sm mb-xl">
+                  Found on {formatDate(post.created_at)}
+                </p>
+
+                {post.description && (
+                  <div className="mb-xl">
+                    <h3 className="font-label-caps text-label-caps text-black/60 mb-sm">Description</h3>
+                    <p className="text-black font-body-lg leading-relaxed whitespace-pre-line">
+                      {displayedDescription}
+                    </p>
+                    {isLongDescription && (
+                      <button
+                        onClick={() => setDescExpanded(!descExpanded)}
+                        className="mt-sm font-button text-button text-[13px] text-black/70 hover:text-black underline underline-offset-2 transition-colors"
+                      >
+                        {descExpanded ? "Show less" : "Read more"}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Location + reporter — plain rows, no card */}
+                <div className="flex flex-col gap-lg mb-xl">
+                  <div className="flex items-start gap-md">
+                    <span className="material-symbols-outlined text-black/60 text-[20px] mt-[2px]">location_on</span>
+                    <div>
+                      <p className="font-label-caps text-label-caps text-black/60 mb-xs">Found at</p>
+                      <p className="font-headline-md text-headline-md text-black">{post.building}</p>
+                      {post.room && <p className="text-black/60 font-body-sm">{post.room}</p>}
+                    </div>
                   </div>
 
-                  <div className="space-y-md mb-xl">
-                    <div className="flex items-center gap-md text-on-surface-variant">
-                      <span className="material-symbols-outlined text-[20px]">verified</span>
-                      <span className="font-body-sm">Identity Verified</span>
-                    </div>
-                    <div className="flex items-center gap-md text-on-surface-variant">
-                      <span className="material-symbols-outlined text-[20px]">schedule</span>
-                      <span className="font-body-sm">
-                        {post.is_resolved ? "Handoff Confirmed" : claimed ? "Awaiting Finder Confirmation" : "Awaiting Claim"}
-                      </span>
+                  <div className="flex items-start gap-md">
+                    <span className="material-symbols-outlined text-black/60 text-[20px] mt-[2px]">person</span>
+                    <div>
+                      <p className="font-label-caps text-label-caps text-black/60 mb-xs">Reported by</p>
+                      <p className="font-headline-md text-headline-md text-black">{post.reporter_name}</p>
+                      <p className="text-black/60 font-body-sm">Verified Student Finder</p>
                     </div>
                   </div>
-
-                  {/* Claim button — changes when clicked */}
-                  <button
-                    onClick={handleClaim}
-                    disabled={claimed}
-                    className={`w-full py-lg rounded-full font-button text-button flex justify-center items-center gap-md transition-all active:scale-95 ${claimed ? "bg-surface-container-high text-on-surface-variant opacity-60 cursor-not-allowed" : "bg-primary text-on-primary hover:bg-primary-container"}`}
-                  >
-                    {claimed ? "Request Sent" : "This is mine"}
-                    <span className="material-symbols-outlined">front_hand</span>
-                  </button>
                 </div>
 
-                {/* Finder info — only shows after claiming */}
+                <hr className="border-outline-variant mb-xl" />
+
+                {/* Status */}
+                <div className="flex items-center gap-md mb-lg">
+                  <div className={`h-3 w-3 rounded-full ${post.is_resolved ? "bg-secondary" : "bg-primary animate-pulse"}`}></div>
+                  <span className="font-headline-md text-headline-md text-black">
+                    {post.is_resolved ? "Resolved" : claimed ? "Pending Confirmation" : "Awaiting Claim"}
+                  </span>
+                </div>
+
+                {/* Claim button — icon-led, modern pill */}
+                <button
+                  onClick={handleClaim}
+                  disabled={claimed}
+                  aria-label={claimed ? "Claim request sent" : "Claim this item"}
+                  className={`group/btn relative w-full sm:w-fit px-xl py-sm rounded-full font-button text-button flex justify-center items-center gap-sm transition-all duration-200 active:scale-95 shadow-sm ${
+                    claimed
+                      ? "bg-black/5 text-black/40 cursor-not-allowed shadow-none"
+                      : "bg-black text-white hover:shadow-lg hover:-translate-y-[1px]"
+                  }`}
+                >
+                  <span
+                    className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
+                      claimed ? "" : "group-hover/btn:rotate-[-8deg]"
+                    }`}
+                  >
+                    {claimed ? "check_circle" : "front_hand"}
+                  </span>
+                  <span className="text-[14px]">{claimed ? "Request Sent" : "Claim item"}</span>
+                </button>
+
+                {/* Finder details — appears after claiming */}
                 {claimed && isLoggedIn && (
-                  <div className="bg-primary-fixed rounded-xl p-xl border-none">
+                  <div className="mt-xl pt-xl border-t border-outline-variant">
                     {post.handed_to_security ? (
                       <>
-                        <h3 className="font-label-caps text-label-caps text-on-primary-fixed mb-md">ITEM HANDED TO SECURITY</h3>
-                        <p className="font-body-sm text-on-primary-fixed leading-relaxed">
+                        <h3 className="font-label-caps text-label-caps text-black/60 mb-sm">Item handed to security</h3>
+                        <p className="font-body-sm text-black leading-relaxed">
                           This item was turned in to Campus Security. Head to the security office with your student ID to claim it.
                         </p>
                       </>
                     ) : (
                       <>
-                        <h3 className="font-label-caps text-label-caps text-on-primary-fixed mb-md">FINDER DETAILS FOR MEETUP</h3>
-                        <div className="space-y-md">
-                          <div className="flex justify-between items-center py-sm border-b border-on-primary-fixed/10">
-                            <span className="text-on-primary-fixed-variant font-body-sm">Name</span>
-                            <span className="text-on-primary-fixed font-headline-md">{post.reporter_name}</span>
+                        <h3 className="font-label-caps text-label-caps text-black/60 mb-md">Finder details for meetup</h3>
+                        <div className="flex flex-col gap-sm">
+                          <div className="flex justify-between items-center py-sm border-b border-outline-variant">
+                            <span className="text-black/60 font-body-sm">Name</span>
+                            <span className="text-black font-headline-md">{post.reporter_name}</span>
                           </div>
-                          <div className="flex justify-between items-center py-sm border-b border-on-primary-fixed/10">
-                            <span className="text-on-primary-fixed-variant font-body-sm">Messenger Link</span>
-                            <span className="text-on-primary-fixed font-headline-md">{post.messenger_link}</span>
+                          <div className="flex justify-between items-center py-sm border-b border-outline-variant">
+                            <span className="text-black/60 font-body-sm">Messenger Link</span>
+                            <span className="text-black font-headline-md">{post.messenger_link}</span>
                           </div>
                           {post.pickup_location && (
                             <div className="flex justify-between items-center py-sm">
-                              <span className="text-on-primary-fixed-variant font-body-sm">Pickup Location</span>
-                              <span className="text-on-primary-fixed font-headline-md">{post.pickup_location}</span>
+                              <span className="text-black/60 font-body-sm">Pickup Location</span>
+                              <span className="text-black font-headline-md">{post.pickup_location}</span>
                             </div>
                           )}
                         </div>
@@ -221,10 +227,33 @@ function ItemDetail() {
                 )}
 
               </div>
+
             </div>
           </div>
         </main>
       </div>
+
+      {/* Lightbox overlay */}
+      {lightboxOpen && (
+        <div
+          onClick={() => setLightboxOpen(false)}
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center cursor-zoom-out p-lg"
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-lg right-lg text-white"
+            aria-label="Close"
+          >
+            <span className="material-symbols-outlined text-[32px]">close</span>
+          </button>
+          <img
+            src={post.image_url}
+            alt={post.title}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <Footer />
       <BottomNav />

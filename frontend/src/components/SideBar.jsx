@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
-function SideBar({ collapsed, setCollapsed }) {
+function SideBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isLoggedIn } = useAuth()
@@ -14,61 +14,41 @@ function SideBar({ collapsed, setCollapsed }) {
 
   return (
     <>
-        {isLoggedIn && (
-      <aside className={`hidden lg:flex flex-col h-[calc(100vh-64px)] fixed left-0 top-16 bg-surface text-on-surface border-r border-outline-variant pt-6 z-40 transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}>
+      {isLoggedIn && (
+        <aside className="hidden lg:flex flex-col items-center h-[calc(100vh-100px)] fixed left-0 top-[100px] w-20 bg-surface text-on-surface pt-6 z-40">
 
-      {/* Header */}
-      <div className="px-6 mb-6 flex justify-between items-center">
-        {!collapsed && (
-          <h2 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Menu</h2>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1 hover:bg-surface-container-high rounded-lg transition-colors text-on-surface-variant"
-        >
-          <span className="material-symbols-outlined text-[20px]">
-            {collapsed ? "menu" : "menu_open"}
-          </span>
-        </button>
-      </div>
+          {/* Nav links */}
+          <nav className="flex-1 flex flex-col items-center gap-20 pt-4 mt-20">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.path)}
+                  className="flex flex-col items-center gap-1 text-on-surface hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[30px]">
+                    {item.icon}
+                  </span>
+                  <span className={`h-[2px] w-5 rounded-full transition-all ${isActive ? "bg-primary" : "bg-transparent"}`} />
+                </button>
+              )
+            })}
+          </nav>
 
-      {/* Nav links */}
-      <nav className="flex-1 space-y-1 px-3">
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.path
-          return (
+          {/* Report button */}
+          <div className="pb-8">
             <button
-              key={item.label}
-              onClick={() => navigate(item.path)}
-              className={`w-full px-4 py-3 rounded-xl flex items-center gap-3 transition-all duration-200 ${isActive ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"}`}
+              onClick={() => navigate("/report")}
+              className="w-12 h-12 rounded-full border border-outline flex items-center justify-center hover:bg-surface-container-high transition-colors"
             >
-              <span className={`material-symbols-outlined ${isActive ? "text-on-primary" : "group-hover:text-primary"} transition-colors`}>
-                {item.icon}
-              </span>
-              {!collapsed && <span className="font-button text-button">{item.label}</span>}
+              <span className="material-symbols-outlined">add</span>
             </button>
-          )
-        })}
-      </nav>
+          </div>
 
-      {/* Report button */}
-      <div className="p-4 border-t border-outline-variant/30">
-        <button
-          onClick={() => navigate("/report")}
-          className={`bg-primary text-white py-3 rounded-xl font-button text-button hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-sm ${collapsed ? "w-12 mx-auto px-3" : "w-full"}`}
-        >
-          <span className="material-symbols-outlined">add</span>
-          {!collapsed && <span>Report Item</span>}
-        </button>
-      </div>
-
-    </aside>
-    )
-
-    }
+        </aside>
+      )}
     </>
-
-    
   )
 }
 
