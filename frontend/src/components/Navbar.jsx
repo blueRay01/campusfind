@@ -58,18 +58,18 @@ function NavBar() {
       <div className="flex items-center gap-20 mr-20">
       {isLoggedIn ? (
         <>
-          <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80">
+          <button className="p-2 hover:bg-surface-container-high transition-colors duration-200 active:opacity-80">
             <span className="material-symbols-outlined text-[30px]">notifications</span>
           </button>
             <div className="relative" ref={dropdownRef}>
               <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-200 active:opacity-80"
+              className="p-2 hover:bg-surface-container-high transition-colors duration-200 active:opacity-80"
             >
               <span className="material-symbols-outlined text-[30px]">account_circle</span>
             </button>
             {isOpen && (
-              <div className="absolute flex flex-col justify-center bg-gray-200 rounded-md">
+              <div className="absolute flex flex-col justify-center bg-background border border-black">
                 <p className="p-2 cursor-pointer" onClick={() => navigate('/profile')}>Profile</p>
                 <p className="p-2 cursor-pointer" onClick={() => {
                   logout()

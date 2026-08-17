@@ -7,9 +7,9 @@ function SideBar() {
   const { isLoggedIn } = useAuth()
 
   const navItems = [
-    { icon: "home", label: "Home", path: "/feed" },
-    { icon: "list_alt", label: "My Posts", path: "/my-posts" },
-    { icon: "inventory_2", label: "My Claims", path: "/my-claims" },
+    { icon: "home", label: "Home", path: "/feed", matches: ["/feed", "/item"] },
+    { icon: "list_alt", label: "My Posts", path: "/my-posts", matches: ["/my-posts", "/report"] },
+    { icon: "inventory_2", label: "My Claims", path: "/my-claims", matches: ["/my-claims"] },
   ]
 
   return (
@@ -20,7 +20,7 @@ function SideBar() {
           {/* Nav links */}
           <nav className="flex-1 flex flex-col items-center gap-20 pt-4 mt-20">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path
+              const isActive = item.matches.some(prefix => location.pathname.startsWith(prefix))
               return (
                 <button
                   key={item.label}
@@ -40,9 +40,15 @@ function SideBar() {
           <div className="pb-8">
             <button
               onClick={() => navigate("/report")}
-              className="w-12 h-12 rounded-full border border-outline flex items-center justify-center hover:bg-surface-container-high transition-colors"
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                location.pathname.startsWith("/report")
+                  ? "bg-black border border-black"
+                  : "border border-outline hover:bg-surface-container-high"
+              }`}
             >
-              <span className="material-symbols-outlined">add</span>
+              <span className={`material-symbols-outlined ${location.pathname.startsWith("/report") ? "text-white" : ""}`}>
+                add
+              </span>
             </button>
           </div>
 

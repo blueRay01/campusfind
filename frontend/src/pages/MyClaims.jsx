@@ -8,7 +8,6 @@ import api from "../api/axios"
 
 function MyClaims() {
   const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
   const [claims, setClaims] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -45,56 +44,56 @@ function MyClaims() {
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
-          <div className="max-w-[1100px] mx-auto">
+        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
+          <div>
 
             {/* Page header */}
             <div className="flex items-end justify-between mb-xl">
               <div>
-                <h2 className="font-headline-lg text-headline-lg text-primary">My Claims</h2>
-                <p className="font-body-lg text-secondary">Track and manage your claimed items across campus.</p>
+                <h2 className="font-headline-lg text-headline-lg text-black mb-xs">My Claims</h2>
+                <p className="font-body-lg text-black/60">Track and manage your claimed items across campus.</p>
               </div>
             </div>
 
             {claims.length === 0 ? (
-              <div className="bg-surface-container-lowest rounded-xl border border-surface-container-highest p-xxl flex flex-col items-center text-center">
-                <span className="material-symbols-outlined text-primary text-5xl mb-lg">search_check</span>
-                <h3 className="font-headline-md text-headline-md text-primary mb-sm">No claims yet</h3>
-                <p className="font-body-sm text-secondary mb-lg">Browse the feed to find something that's yours.</p>
+              <div className="bg-surface-container-lowest p-xl max-w-md mx-auto flex flex-col items-center text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)]">
+                <span className="material-symbols-outlined text-black text-5xl mb-lg">search_check</span>
+                <h3 className="font-headline-md text-headline-md text-black mb-sm">No claims yet</h3>
+                <p className="font-body-lg text-black/60 mb-lg">Browse the feed to find something that's yours.</p>
                 <button
                   onClick={() => navigate("/feed")}
-                  className="px-xl py-md bg-primary text-on-primary rounded-full font-button text-button hover:opacity-90 active:scale-95 transition-all"
+                  className="px-xl py-md bg-black text-white rounded-full font-button text-button hover:opacity-90 active:scale-95 transition-all"
                 >
                   Browse All Items
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xxl">
                 {claims.map(claim => (
                   <div
                     key={claim.claim_id}
-                    className={`bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg flex flex-col hover:bg-white transition-all ${claim.is_resolved ? "opacity-80" : ""}`}
+                    className={`bg-background cute-card-shadow transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)] duration-300 ${claim.is_resolved ? "opacity-80" : ""}`}
                   >
-                    <div className="w-full h-40 rounded-lg overflow-hidden mb-md relative">
+                    <div className="w-full h-80 overflow-hidden mb-md relative">
                       <img
                         src={claim.image_url}
                         alt={claim.title}
                         className={`w-full h-full object-cover ${claim.is_resolved ? "grayscale" : ""}`}
                       />
-                      <div className={`absolute top-sm right-sm px-md py-xs rounded-full font-label-caps text-[10px] ${claim.is_resolved ? "bg-surface-container-highest text-secondary" : "bg-secondary-container text-on-secondary-container"}`}>
+                      <div className={`absolute top-sm right-sm px-md py-xs rounded-full font-label-caps text-label-caps ${claim.is_resolved ? "bg-surface-container-highest text-black/60" : "bg-secondary-container text-on-secondary-container"}`}>
                         {claim.is_resolved ? "RESOLVED" : "PENDING"}
                       </div>
                     </div>
 
-                    <h3 className={`font-button text-button mb-xs ${claim.is_resolved ? "text-on-surface-variant line-through" : "text-primary"}`}>
+                    <h3 className={`font-headline-md uppercase text-headline-md mb-xs ${claim.is_resolved ? "text-black/40 line-through" : "text-black"}`}>
                       {claim.title}
                     </h3>
 
-                    <div className="flex items-center gap-sm text-secondary mb-md">
+                    <div className="flex items-center gap-sm text-black/60 mb-md">
                       <span className="material-symbols-outlined text-sm">location_on</span>
-                      <span className="font-body-sm text-body-sm">
+                      <span className="font-body-lg">
                         {`${claim.building}${claim.room ? `, ${claim.room}` : ''}`}
                       </span>
                     </div>
@@ -103,22 +102,22 @@ function MyClaims() {
                     {claim.is_resolved ? (
                       <button
                         onClick={() => navigate(`/item/${claim.post_id}`)}
-                        className="w-full py-sm bg-surface-variant text-on-surface-variant rounded-full font-label-caps text-[10px] uppercase hover:bg-surface-container-highest transition-all"
+                        className="w-full py-sm bg-surface-variant text-black rounded-full font-label-caps text-label-caps uppercase hover:bg-background transition-all"
                       >
                         View Details
                       </button>
                     ) : (
                       <>
                         {claim.handed_to_security ? (
-                          <p className="font-body-sm text-secondary italic">Head to Campus Security to pick this up.</p>
+                          <p className="font-body-lg text-black/60 italic">Head to Campus Security to pick this up.</p>
                         ) : claim.pickup_location ? (
-                          <p className="font-body-sm text-secondary italic">Pickup: {claim.pickup_location}</p>
+                          <p className="font-body-lg text-black/60 italic">Pickup: {claim.pickup_location}</p>
                         ) : (
-                          <p className="font-body-sm text-secondary italic">Awaiting finder confirmation.</p>
+                          <p className="font-body-lg text-black/60 italic">Awaiting finder confirmation.</p>
                         )}
                         <button
                           onClick={() => handleCancelClaim(claim.claim_id)}
-                          className="w-full py-sm bg-error-container text-error rounded-full font-label-caps text-[10px] uppercase hover:opacity-90 transition-all"
+                          className="w-full py-sm bg-error-container text-error border border-red-500 font-label-caps text-label-caps uppercase hover:opacity-90 transition-all"
                         >
                           Cancel Claim
                         </button>
@@ -129,17 +128,17 @@ function MyClaims() {
                 ))}
 
                 {/* CTA card */}
-                <div className="bg-primary-container rounded-xl p-lg flex flex-col items-center justify-center text-center gap-md border border-primary-fixed-dim shadow-lg">
+                <div className="bg-primary-container p-lg flex flex-col items-center justify-center text-center gap-md">
                   <div className="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-3xl">search_check</span>
+                    <span className="material-symbols-outlined text-black text-3xl">search_check</span>
                   </div>
                   <div>
-                    <h3 className="font-headline-md text-headline-md text-on-primary-fixed">Lost Something Else?</h3>
-                    <p className="font-body-sm text-on-primary-container mb-lg">Check the global feed for recently posted items across campus.</p>
+                    <h3 className="font-headline-md text-headline-md text-black">Lost Something Else?</h3>
+                    <p className="font-body-lg text-black/60 mb-lg">Check the global feed for recently posted items across campus.</p>
                   </div>
                   <button
                     onClick={() => navigate("/feed")}
-                    className="px-xl py-md bg-primary-fixed text-on-primary-fixed rounded-full font-button text-button hover:opacity-90 active:scale-95 transition-all"
+                    className="px-xl py-md bg-black text-white rounded-full font-button text-button hover:opacity-90 active:scale-95 transition-all"
                   >
                     Browse All Items
                   </button>

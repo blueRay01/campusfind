@@ -53,8 +53,6 @@ function ReportItem() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id)
-
-  const [collapsed, setCollapsed] = useState(false);
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null);
   const [dragOver, setDragOver] = useState(false);
@@ -157,9 +155,9 @@ function ReportItem() {
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
+        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
           <div className="max-w-[1100px] mx-auto">
 
             {/* Page header */}
@@ -179,7 +177,7 @@ function ReportItem() {
               <div className="col-span-12 lg:col-span-7 flex flex-col gap-lg">
 
                 {/* Basic info card */}
-                <div className="bg-surface-container-lowest p-xl rounded-xl border border-surface-container-highest">
+                <div className="bg-background p-xl">
                   <div className="flex flex-col gap-lg">
 
                     <div>
@@ -190,7 +188,7 @@ function ReportItem() {
                         onChange={(e) => setItemName(e.target.value)}
                         placeholder="e.g. Blue HydroFlask, Black AirPods Case"
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all"
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
 
@@ -200,7 +198,7 @@ function ReportItem() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
                       >
                         <option value="">Select a category</option>
                         {categories.map(cat => (
@@ -216,7 +214,7 @@ function ReportItem() {
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Any distinguishing details — color, brand, stickers, condition, etc."
                         rows={4}
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-2xl font-body-lg focus:ring-2 focus:ring-primary transition-all resize-none"
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all resize-none"
                       />
                     </div>
 
@@ -224,7 +222,7 @@ function ReportItem() {
                 </div>
 
                 {/* Location card */}
-                <div className="bg-surface-container-lowest p-xl rounded-xl border border-surface-container-highest">
+                <div className="bg-background p-xl">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
 
                     <div className="md:col-span-2">
@@ -233,7 +231,7 @@ function ReportItem() {
                         value={building}
                         onChange={(e) => setBuilding(e.target.value)}
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
+                        className="w-full px-md py-sm bg-background border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
                       >
                         <option value="">Select a building</option>
                         {buildings.map(b => (
@@ -249,7 +247,7 @@ function ReportItem() {
                         value={room}
                         onChange={(e) => setRoom(e.target.value)}
                         placeholder="e.g. 2nd Floor, Room 204"
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all"
+                        className="w-full px-md py-sm bg-background border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
 
@@ -277,7 +275,7 @@ function ReportItem() {
                         onChange={(e) => setPickupLocation(e.target.value)}
                         disabled={handedToSecurity}
                         placeholder="e.g. Meet at the Library entrance, 3rd Floor Lounge"
-                        className={`w-full px-md py-sm border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all ${handedToSecurity ? "bg-surface-container-highest text-on-surface-variant cursor-not-allowed" : "bg-surface-container-low"}`}
+                        className={`w-full px-md py-sm border border-black rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all ${handedToSecurity ? "bg-surface-container-highest text-on-surface-variant cursor-not-allowed" : "bg-surface-container-low"}`}
                       />
                     </div>
 
@@ -292,14 +290,14 @@ function ReportItem() {
                 {/* Image upload zone */}
                 <div
                   onClick={() => document.getElementById("fileInput").click()}
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }} 
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
-                  className={`bg-surface-container-lowest p-lg rounded-xl border-2 border-dashed flex flex-col items-center justify-center min-h-[340px] text-center cursor-pointer transition-all group ${dragOver ? "border-primary bg-primary-fixed/30" : "border-outline-variant hover:border-primary"}`}
+                  className={`bg-surface-container-lowest p-lg border flex flex-col items-center justify-center min-h-[340px] text-center cursor-pointer transition-all group ${dragOver ? "border-primary bg-primary-fixed/30" : "border-black hover:border-primary"}`}
                 >
                   {preview ? (
                     <div className="w-full h-full relative">
-                      <img src={preview} alt="Preview" className="w-full h-64 object-cover rounded-lg" />
+                      <img src={preview} alt="Preview" className="w-full h-64 object-cover" />
                       <p className="font-body-sm text-on-surface-variant mt-md">Click to change photo</p>
                     </div>
                   ) : (
@@ -327,7 +325,7 @@ function ReportItem() {
                   </p>
                   <button
                     type="submit"
-                    className="w-full bg-primary text-on-primary py-lg rounded-full font-button text-headline-md shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
+                    className="w-full bg-primary text-on-primary py-lg font-button text-body-lg shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
                   >
                     {isEditMode ? "Save Changes" : "Submit Report"}
                   </button>
@@ -335,7 +333,7 @@ function ReportItem() {
                   <button
                     type="button"
                     onClick={() => navigate(isEditMode ? "/my-posts" : "/feed")}
-                    className="w-full bg-surface-container-high text-on-surface py-lg rounded-full font-button text-button hover:bg-surface-container-highest transition-all"
+                    className="w-full bg-surface-container-high text-on-surface py-lg font-button text-body-lg hover:bg-surface-container-highest transition-all"
                   >
                     Cancel
                   </button>

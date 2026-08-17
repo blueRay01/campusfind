@@ -69,7 +69,7 @@ function Feed() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-md py-sm pr-10 bg-background border-none rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
+                  className="px-md py-sm pr-10 bg-background border border-transparent focus:border-black rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
                 >
                   {sortOptions.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -82,10 +82,10 @@ function Feed() {
 
               <div className="relative">
                 <select
-                  value={activeCategory}
-                  onChange={(e) => setActiveCategory(e.target.value)}
-                  className="px-md py-sm pr-10 bg-background border-none rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
-                >
+                    value={activeCategory}
+                    onChange={(e) => setActiveCategory(e.target.value)}
+                    className="px-md py-sm pr-10 bg-background border border-transparent focus:border-black rounded-full font-body-lg focus:outline-none transition-all appearance-none text-body-lg"
+                  >
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}

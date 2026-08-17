@@ -8,7 +8,6 @@ import api from "../api/axios"
 
 function MyPosts() {
   const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState("Active")
   const [posts, setPosts] = useState([]);
 
@@ -54,29 +53,29 @@ function MyPosts() {
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
-          <div className="max-w-[1100px] mx-auto">
+        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
+          <div>
 
             {/* Page header */}
             <div className="flex justify-between items-end mb-xl">
               <div>
-                <h2 className="font-headline-lg text-headline-lg text-primary">My Reported Items</h2>
-                <p className="text-secondary font-body-lg mt-xs">Manage the items you've found or lost on campus.</p>
+                <h2 className="font-headline-lg text-headline-lg text-black">My Reported Items</h2>
+                <p className="text-black/60 font-body-lg mt-xs">Manage the items you've found or lost on campus.</p>
               </div>
 
               {/* Tab toggle */}
               <div className="flex bg-surface-container-low rounded-full p-xs">
                 <button
                   onClick={() => setActiveTab("Active")}
-                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Active" ? "bg-white shadow-sm text-primary" : "text-secondary hover:text-primary"}`}
+                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Active" ? "bg-white shadow-sm text-black" : "text-black/60 hover:text-black"}`}
                 >
                   Active ({posts.filter(p => p.is_resolved === false).length})
                 </button>
                 <button
                   onClick={() => setActiveTab("Resolved")}
-                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Resolved" ? "bg-white shadow-sm text-primary" : "text-secondary hover:text-primary"}`}
+                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Resolved" ? "bg-white shadow-sm text-black" : "text-black/60 hover:text-black"}`}
                 >
                   Resolved ({posts.filter(p => p.is_resolved === true).length})
                 </button>
@@ -84,34 +83,34 @@ function MyPosts() {
             </div>
 
             {/* Cards grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xxl">
               {filteredPosts.map(post => (
                 <div
                   key={post.id}
-                  className={`bg-white rounded-lg border border-surface-container-highest overflow-hidden hover:shadow-lg transition-all duration-300 group ${post.is_resolved === true ? "opacity-80 hover:opacity-100" : ""}`}
+                  className={`bg-background cute-card-shadow overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)] duration-300 group ${post.is_resolved === true ? "opacity-80 hover:opacity-100" : ""}`}
                 >
                   {/* Image */}
-                  <div className={`relative h-48 overflow-hidden ${post.is_resolved === true ? "grayscale group-hover:grayscale-0 transition-all duration-500" : ""}`}>
+                  <div className={`relative h-80 overflow-hidden ${post.is_resolved === true ? "grayscale group-hover:grayscale-0 transition-all duration-500" : ""}`}>
                     <img
                       src={post.image_url}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute top-md left-md">
-                      <span className={`px-md py-1 text-[11px] font-bold uppercase tracking-wider rounded-full shadow-sm ${post.is_resolved === false ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-secondary-container text-on-secondary-container"}`}>
+                      <span className={`px-md py-1 font-label-caps text-label-caps rounded-full ${post.is_resolved === false ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-secondary-container text-on-secondary-container"}`}>
                         {post.is_resolved ? "Resolved" : "Active"}
                       </span>
                     </div>
                     {post.is_resolved === true && (
-                      <div className="absolute inset-0 bg-secondary/10 pointer-events-none" />
+                      <div className="absolute inset-0 bg-black/10 pointer-events-none" />
                     )}
                   </div>
 
                   {/* Card body */}
                   <div className="p-lg">
                     <div className="flex justify-between items-start mb-sm">
-                      <h3 className="font-headline-md text-headline-md text-primary">{post.title}</h3>
-                      <span className="text-secondary">
+                      <h3 className="font-headline-md text-headline-md text-black">{post.title}</h3>
+                      <span className="text-black/60">
                         <span className="material-symbols-outlined text-[18px]">
                           {post.is_resolved === true ? "check_circle" : "more_vert"}
                         </span>
@@ -119,11 +118,11 @@ function MyPosts() {
                     </div>
 
                     <div className="flex flex-col gap-xs mb-lg">
-                      <div className="flex items-center gap-xs text-secondary text-body-sm">
+                      <div className="flex items-center gap-xs text-black/60 font-body-lg">
                         <span className="material-symbols-outlined text-[16px]">location_on</span>
                         {`${post.building}${post.room ? `, ${post.room}`:''}`}
                       </div>
-                      <div className="flex items-center gap-xs text-secondary text-body-sm">
+                      <div className="flex items-center gap-xs text-black/60 font-body-lg">
                         <span className="material-symbols-outlined text-[16px]">calendar_today</span>
                         {post.created_at}
                       </div>
@@ -135,7 +134,7 @@ function MyPosts() {
                         {post.is_claimed && (
                           <button
                             onClick={() => handleResolve(post.id)}
-                            className="w-full py-sm bg-primary text-on-primary rounded-lg font-button text-button hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+                            className="w-full py-sm bg-black text-white font-button text-button hover:opacity-90 transition-all flex items-center justify-center gap-2"
                           >
                             <span className="material-symbols-outlined text-[18px]">task_alt</span>
                             Confirm Handoff
@@ -144,27 +143,27 @@ function MyPosts() {
                         <div className="grid grid-cols-3 gap-sm">
                           <button
                             onClick={() => navigate(`/report/${post.id}`)}
-                            className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low rounded-lg transition-colors group/btn"
+                            className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low transition-colors group/btn"
                           >
-                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">edit</span>
-                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">EDIT</span>
+                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-black">edit</span>
+                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-black">EDIT</span>
                           </button>
-                          <button onClick={() => handleDelete(post.id)} className="flex flex-col items-center gap-1 py-sm hover:bg-error-container rounded-lg transition-colors group/btn">
-                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-error">delete</span>
-                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-error">DELETE</span>
+                          <button onClick={() => handleDelete(post.id)} className="flex flex-col items-center gap-1 py-sm hover:bg-error-container transition-colors group/btn">
+                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-error">delete</span>
+                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-error">DELETE</span>
                           </button>
                           <button
                             onClick={() => navigate(`/item/${post.id}`)}
-                            className="flex flex-col items-center gap-1 py-sm hover:bg-primary-fixed rounded-lg transition-colors group/btn"
+                            className="flex flex-col items-center gap-1 py-sm hover:bg-primary-fixed transition-colors group/btn"
                           >
-                            <span className="material-symbols-outlined text-secondary group-hover/btn:text-primary">visibility</span>
-                            <span className="text-[10px] font-bold text-secondary group-hover/btn:text-primary">DETAILS</span>
+                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-black">visibility</span>
+                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-black">DETAILS</span>
                           </button>
                         </div>
                       </div>
                     ) : (
                       <div className="pt-md border-t border-surface-container-low flex justify-center">
-                        <span className="text-label-caps text-secondary font-bold uppercase">Item Claimed & Verified</span>
+                        <span className="font-label-caps text-label-caps text-black/60">Item Claimed & Verified</span>
                       </div>
                     )}
                   </div>
@@ -174,14 +173,14 @@ function MyPosts() {
               {/* CTA card */}
               <div
                 onClick={() => navigate("/report")}
-                className="lg:col-span-3 mt-xl p-xxl bg-white rounded-xl border-2 border-dashed border-primary/20 flex flex-col items-center justify-center text-center group hover:border-primary hover:bg-primary-fixed/30 transition-all cursor-pointer"
+                className="lg:col-span-4 mt-xl p-xxl bg-background border border-dashed border-black/20 flex flex-col items-center justify-center text-center group hover:border-black transition-all cursor-pointer"
               >
                 <div className="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center mb-lg group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
+                  <span className="material-symbols-outlined text-black text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
                 </div>
-                <h3 className="font-headline-lg text-headline-lg text-primary mb-sm">Found something else?</h3>
-                <p className="text-secondary font-body-lg max-w-md mb-xl">Help your fellow students by reporting items you find around campus. It only takes a minute to make someone's day.</p>
-                <button className="px-xl py-lg bg-primary text-on-primary font-button text-button rounded-full shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+                <h3 className="font-headline-lg text-headline-lg text-black mb-sm">Found something else?</h3>
+                <p className="text-black/60 font-body-lg max-w-md mb-xl">Help your fellow students by reporting items you find around campus. It only takes a minute to make someone's day.</p>
+                <button className="px-xl py-lg bg-black text-white font-button text-button rounded-full hover:opacity-90 active:scale-95 transition-all">
                   Report a New Item
                 </button>
               </div>
