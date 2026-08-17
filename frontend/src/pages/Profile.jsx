@@ -1,27 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
-
-// Simulated user data — will come from backend/auth later
-const mockUser = {
-  name: "Giselle Delapena",
-  studentId: "2021-00123",
-  course: "BSCS",
-  email: "delapena.giselle1@gmail.com",
-  joinedDate: "August 2024",
-  lastNameChange: null, // null means never changed
-  avatar: null,
-  stats: {
-    reported: 5,
-    returned: 3,
-    claims: 4,
-  }
-}
-
+import api from "../api/axios"
 // Name can only be changed once every 30 days
+
+
 const NAME_CHANGE_COOLDOWN_DAYS = 30
 
 function getDaysUntilNextChange(lastChanged) {
@@ -34,13 +20,28 @@ function getDaysUntilNextChange(lastChanged) {
 function Profile() {
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
-
-  const [user, setUser] = useState(mockUser)
+  const [user, setUser] = useState("")
   const [editingName, setEditingName] = useState(false)
-  const [newName, setNewName] = useState(user.name)
+  const [newName, setNewName] = useState("")
   const [nameError, setNameError] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
+  const [messengerLink, setMessengerLink] = useState('')
+  const [editingMessenger, setEditingMessenger] = useState(false)
+
+  useEffect(() => {
+    const fetchProfile = async() => {
+      const response = await api.get('/auth/my') 
+      setUser(response.data)
+      setNewName(response.data.name)
+    }
+    fetchProfile()
+  }, [])
+
+  const handleMessengerSave = async () => {
+    const update = await api.patch('/auth/my', {messenger_link: messengerLink})
+    setUser(prev => ({ ...user, messenger_link: update.data.messenger_link}))
+  }
 
   const daysUntilChange = getDaysUntilNextChange(user.lastNameChange)
   const canChangeName = daysUntilChange === 0
@@ -68,6 +69,8 @@ function Profile() {
     setNameError("")
     triggerSuccess("Display name updated successfully.")
   }
+
+  
 
   const triggerSuccess = (message) => {
     setSuccessMessage(message)
@@ -98,7 +101,7 @@ function Profile() {
               {/* Avatar */}
               <div className="relative flex-shrink-0">
                 <div className="w-24 h-24 rounded-full bg-primary-fixed flex items-center justify-center text-primary text-4xl font-bold select-none">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user?.name?.charAt(0).toUpperCase() || "?"}
                 </div>
                 <button className="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-container transition-colors shadow-md">
                   <span className="material-symbols-outlined text-[16px]">edit</span>
@@ -144,7 +147,8 @@ function Profile() {
                     <div className="flex items-center gap-sm">
                       <h2 className="font-headline-md text-headline-md text-primary">{user.name}</h2>
                       <button
-                        onClick={() => setEditingName(true)}
+                        onClick={() =>
+                           setEditingName(true)}
                         className="p-xs hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant hover:text-primary"
                         title={canChangeName ? "Edit name" : `Name change available in ${daysUntilChange} days`}
                       >
@@ -166,7 +170,7 @@ function Profile() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-lg mb-lg">
+            {/* <div className="grid grid-cols-3 gap-lg mb-lg">
               {[
                 { label: "Items Reported", value: user.stats.reported, icon: "inventory_2" },
                 { label: "Successfully Returned", value: user.stats.returned, icon: "handshake" },
@@ -180,7 +184,7 @@ function Profile() {
                   <p className="font-label-caps text-label-caps text-on-surface-variant">{stat.label}</p>
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Account details — read only fields */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl mb-lg">
@@ -188,7 +192,7 @@ function Profile() {
               <div className="flex flex-col gap-md">
 
                 {[
-                  { label: "Student ID", value: user.studentId, icon: "badge", editable: false, note: "Cannot be changed." },
+                  { label: "Student ID", value: user.student_id, icon: "badge", editable: false, note: "Cannot be changed." },
                   { label: "Email Address", value: user.email, icon: "mail", editable: false, note: "Contact support to change your email." },
                   { label: "Course", value: user.course, icon: "school", editable: false, note: "Contact your registrar to update." },
                 ].map(field => (
@@ -203,6 +207,61 @@ function Profile() {
                     </div>
                   </div>
                 ))}
+
+                <div className="flex items-start gap-md p-md bg-surface-container-low rounded-xl">
+                  <div className="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-on-surface-variant">link</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-label-caps text-label-caps text-on-surface-variant mb-xs">Facebook Link</p>
+
+                    {editingMessenger ? (
+                      <div className="flex flex-col gap-xs">
+                        <div className="flex gap-sm">
+                          <input
+                            type="text"
+                            value={messengerLink}
+                            onChange={(e) => setMessengerLink(e.target.value)}
+                            className="flex-1 px-md py-sm bg-surface-container-lowest rounded-full border-none focus:ring-2 focus:ring-primary-container font-body-lg text-on-surface"
+                            autoFocus
+                          />
+                          <button
+                            onClick={async () => {
+                              await handleMessengerSave()
+                              setEditingMessenger(false)
+                              triggerSuccess("Facebook link updated successfully.")
+                            }}
+                            className="px-md py-sm bg-primary text-white rounded-full font-button text-button hover:bg-primary-container transition-colors"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setMessengerLink(user.messenger_link)
+                              setEditingMessenger(false)
+                            }}
+                            className="px-md py-sm bg-surface-container-high text-on-surface rounded-full font-button text-button hover:bg-surface-container-highest transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-sm">
+                        <p className="font-body-lg text-on-surface">{user.messenger_link || "Not set"}</p>
+                        <button
+                          onClick={() => 
+                            { setMessengerLink(user.messenger_link) 
+                              setEditingMessenger(true)}}
+                          className="p-xs hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant hover:text-primary"
+                          title="Edit Facebook link"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
               </div>
             </div>

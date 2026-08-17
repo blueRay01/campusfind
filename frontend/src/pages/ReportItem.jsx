@@ -1,9 +1,10 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import NavBar from "../components/NavBar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
+import api from "../api/axios"
 
 const buildings = [
   "BLDG. 1 - Arts and Culture Building",
@@ -49,22 +50,60 @@ const categories = [
 ]
 
 function ReportItem() {
-  const navigate = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
-  const [preview, setPreview] = useState(null)
-  const [dragOver, setDragOver] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [handedToSecurity, setHandedToSecurity] = useState(false)
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id)
+  const [preview, setPreview] = useState(null);
+  const [image, setImage] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [handedToSecurity, setHandedToSecurity] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(isEditMode);
 
   // Form fields
   const [itemName, setItemName] = useState("")
   const [category, setCategory] = useState("")
   const [building, setBuilding] = useState("")
   const [room, setRoom] = useState("")
+  const [pickupLocation, setPickupLocation] = useState("")
+  const [description, setDescription] = useState("")
+
+  // In edit mode, fetch the existing post and pre-fill every field
+  useEffect(() => {
+    if (!isEditMode) return
+
+    const fetchPost = async () => {
+      try {
+        const response = await api.get(`/posts/${id}`)
+        const post = response.data
+        setItemName(post.title || "")
+        setCategory(post.category || "")
+        setBuilding(post.building || "")
+        setRoom(post.room || "")
+        setHandedToSecurity(post.handed_to_security || false)
+        setPickupLocation(post.pickup_location || "")
+        setDescription(post.description || "")
+        setPreview(post.image_url || null)
+      } catch (err) {
+        setError("Failed to load this item for editing.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPost()
+  }, [id, isEditMode])
+
+  // Clear pickup location whenever "handed to security" gets checked
+  useEffect(() => {
+    if (handedToSecurity) {
+      setPickupLocation("")
+    }
+  }, [handedToSecurity])
 
   const handleFileChange = (file) => {
     if (file) {
       setPreview(URL.createObjectURL(file))
+      setImage(file)
     }
   }
 
@@ -75,11 +114,40 @@ function ReportItem() {
     handleFileChange(file)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 4000)
+
+    if (!handedToSecurity && !pickupLocation.trim()) {
+      setError("Please either check 'Handed to Security' or provide a pickup location.")
+      return
+    }
+    const formData = new FormData()
+    formData.append('itemName', itemName)
+    formData.append('category', category)
+    formData.append('building', building)
+    formData.append('room', room)
+    formData.append('handedToSecurity', handedToSecurity)
+    formData.append('pickupLocation', pickupLocation)
+    formData.append('description', description)
+    // Only attach the image if the user selected a new one —
+    // in edit mode, no new file means "keep the existing image"
+    if (image) {
+      formData.append('image', image)
+    }
+
+    try {
+      if (isEditMode) {
+        await api.patch(`/posts/${id}`, formData)
+      } else {
+        await api.post('/posts', formData)
+      }
+      navigate('/my-posts')
+    } catch (error) {
+      setError(isEditMode ? 'Failed to update item. Please try again' : 'Failed to report item. Please try again')
+    }
   }
+
+  if (loading) return <p>Loading...</p>
 
   return (
     <div className="bg-background text-on-surface min-h-screen">
@@ -87,15 +155,19 @@ function ReportItem() {
       <NavBar />
 
       <div className="flex">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
-        <main className={`flex-1 p-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300 ${collapsed ? "lg:ml-20" : "lg:ml-64"}`}>
+        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
           <div className="max-w-[1100px] mx-auto">
 
             {/* Page header */}
             <div className="mb-xl">
-              <h2 className="font-headline-lg text-headline-lg text-primary mb-xs">Report a Found Item</h2>
-              <p className="text-secondary font-body-lg">Help reconnect a fellow student with their lost belongings. Please provide as much detail as possible.</p>
+              <h2 className="font-headline-lg text-headline-lg text-primary mb-xs">
+                {isEditMode ? "Edit Reported Item" : "Report a Found Item"}
+              </h2>
+              <p className="text-secondary font-body-lg">
+                {isEditMode ? "Update the details of your reported item." : "Help reconnect a fellow student with their lost belongings. Please provide as much detail as possible."}
+              </p>
             </div>
 
             {/* Form grid */}
@@ -105,7 +177,7 @@ function ReportItem() {
               <div className="col-span-12 lg:col-span-7 flex flex-col gap-lg">
 
                 {/* Basic info card */}
-                <div className="bg-surface-container-lowest p-xl rounded-xl border border-surface-container-highest">
+                <div className="bg-background p-xl">
                   <div className="flex flex-col gap-lg">
 
                     <div>
@@ -116,7 +188,7 @@ function ReportItem() {
                         onChange={(e) => setItemName(e.target.value)}
                         placeholder="e.g. Blue HydroFlask, Black AirPods Case"
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all"
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
 
@@ -126,7 +198,7 @@ function ReportItem() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
                       >
                         <option value="">Select a category</option>
                         {categories.map(cat => (
@@ -135,20 +207,31 @@ function ReportItem() {
                       </select>
                     </div>
 
+                    <div>
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">DESCRIPTION (OPTIONAL)</label>
+                      <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Any distinguishing details — color, brand, stickers, condition, etc."
+                        rows={4}
+                        className="w-full px-md py-sm bg-surface-container-low border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all resize-none"
+                      />
+                    </div>
+
                   </div>
                 </div>
 
                 {/* Location card */}
-                <div className="bg-surface-container-lowest p-xl rounded-xl border border-surface-container-highest">
+                <div className="bg-background p-xl">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
 
                     <div className="md:col-span-2">
-                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">BUILDING</label>
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">WHERE ITEM WAS FOUND — BUILDING</label>
                       <select
                         value={building}
                         onChange={(e) => setBuilding(e.target.value)}
                         required
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
+                        className="w-full px-md py-sm bg-background border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all appearance-none"
                       >
                         <option value="">Select a building</option>
                         {buildings.map(b => (
@@ -164,7 +247,7 @@ function ReportItem() {
                         value={room}
                         onChange={(e) => setRoom(e.target.value)}
                         placeholder="e.g. 2nd Floor, Room 204"
-                        className="w-full px-md py-sm bg-surface-container-low border-none rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all"
+                        className="w-full px-md py-sm bg-background border border-black font-body-lg focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
 
@@ -182,6 +265,20 @@ function ReportItem() {
                       </label>
                     </div>
 
+                    <div className="md:col-span-2">
+                      <label className="font-label-caps text-label-caps text-on-surface-variant block mb-sm">
+                        PICKUP LOCATION {handedToSecurity ? "(not needed — handed to security)" : "(optional)"}
+                      </label>
+                      <input
+                        type="text"
+                        value={pickupLocation}
+                        onChange={(e) => setPickupLocation(e.target.value)}
+                        disabled={handedToSecurity}
+                        placeholder="e.g. Meet at the Library entrance, 3rd Floor Lounge"
+                        className={`w-full px-md py-sm border border-black rounded-full font-body-lg focus:ring-2 focus:ring-primary transition-all ${handedToSecurity ? "bg-surface-container-highest text-on-surface-variant cursor-not-allowed" : "bg-surface-container-low"}`}
+                      />
+                    </div>
+
                   </div>
                 </div>
 
@@ -193,14 +290,14 @@ function ReportItem() {
                 {/* Image upload zone */}
                 <div
                   onClick={() => document.getElementById("fileInput").click()}
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }} 
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
-                  className={`bg-surface-container-lowest p-lg rounded-xl border-2 border-dashed flex flex-col items-center justify-center min-h-[340px] text-center cursor-pointer transition-all group ${dragOver ? "border-primary bg-primary-fixed/30" : "border-outline-variant hover:border-primary"}`}
+                  className={`bg-surface-container-lowest p-lg border flex flex-col items-center justify-center min-h-[340px] text-center cursor-pointer transition-all group ${dragOver ? "border-primary bg-primary-fixed/30" : "border-black hover:border-primary"}`}
                 >
                   {preview ? (
                     <div className="w-full h-full relative">
-                      <img src={preview} alt="Preview" className="w-full h-64 object-cover rounded-lg" />
+                      <img src={preview} alt="Preview" className="w-full h-64 object-cover" />
                       <p className="font-body-sm text-on-surface-variant mt-md">Click to change photo</p>
                     </div>
                   ) : (
@@ -221,21 +318,6 @@ function ReportItem() {
                   />
                 </div>
 
-                {/* Map preview */}
-                <div className="bg-surface-container-low rounded-xl overflow-hidden h-40 relative">
-                  <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAb9hvAV4CvU9xyIlg0bbftyLl6cmtk7YarOF5yWzSTUYSXDnZVeDgNaKF9UEwSCM7GMzGouIFCcqoj-GYCfQFj6qt1IP37wckBbzHad9ag_38MklQ1uM2X6WQR0toexHXG_YHpb-C_RMepxUzRn-vga8RXSDYTULsaeCMQ3x7KGlugVH6WLhWhXa_1kcfWAKQZ8bXGku4834c-HE4QUWLwZp4VtiuQmlzNu_GpchgoJsq89WpUohzOz8Q29PM01c5_jHX8W8gxpw"
-                    alt="Campus map"
-                    className="w-full h-full object-cover opacity-60"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-surface-container-lowest/80 backdrop-blur-md px-md py-sm rounded-full flex items-center gap-sm border border-white">
-                      <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
-                      <span className="font-label-caps text-label-caps text-primary">SELECT LOCATION ON MAP</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Submit */}
                 <div className="flex flex-col gap-md mt-auto">
                   <p className="font-body-sm text-on-surface-variant text-center px-lg">
@@ -243,14 +325,15 @@ function ReportItem() {
                   </p>
                   <button
                     type="submit"
-                    className="w-full bg-primary text-on-primary py-lg rounded-full font-button text-headline-md shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
+                    className="w-full bg-primary text-on-primary py-lg font-button text-body-lg shadow-lg hover:opacity-90 active:scale-[0.98] transition-all"
                   >
-                    Submit Report
+                    {isEditMode ? "Save Changes" : "Submit Report"}
                   </button>
+                  {error && <p className='text-red-500 text-sm'>{error}</p>}
                   <button
                     type="button"
-                    onClick={() => navigate("/feed")}
-                    className="w-full bg-surface-container-high text-on-surface py-lg rounded-full font-button text-button hover:bg-surface-container-highest transition-all"
+                    onClick={() => navigate(isEditMode ? "/my-posts" : "/feed")}
+                    className="w-full bg-surface-container-high text-on-surface py-lg font-button text-body-lg hover:bg-surface-container-highest transition-all"
                   >
                     Cancel
                   </button>
@@ -262,15 +345,6 @@ function ReportItem() {
           </div>
         </main>
       </div>
-
-      {/* Success toast */}
-      {submitted && (
-        <div className="fixed bottom-lg right-lg bg-primary-container text-on-primary-container px-xl py-md rounded-full flex items-center gap-md shadow-xl z-50 transition-all duration-500">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-          <span className="font-button">Report Submitted Successfully!</span>
-        </div>
-      )}
-
       <Footer />
       <BottomNav />
 
