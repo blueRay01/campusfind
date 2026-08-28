@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { useState, useRef, useEffect } from "react";
 
-function NavBar() {
+function Navbar() {
   const navigate = useNavigate();
   const { isLoggedIn, openAuthModal, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -100,4 +100,4 @@ function NavBar() {
   )
 }
 
-export default NavBar
+export default Navbar

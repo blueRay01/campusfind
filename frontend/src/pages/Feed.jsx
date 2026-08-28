@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import NavBar from "../components/NavBar"
+import Navbar from "../components/Navbar"
 import SideBar from "../components/SideBar"
 import ItemCard from "../components/ItemCard"
 import BottomNav from "../components/BottomNav"
@@ -55,7 +55,8 @@ function Feed() {
 
  return (
     <div className="bg-background text-on-surface min-h-screen">
-      <NavBar />
+      
+      <Navbar />
 
       <div className="flex">
         <SideBar />

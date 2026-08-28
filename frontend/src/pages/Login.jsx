@@ -28,7 +28,7 @@ function Login() {
 
     return (
         <div className="bg-background text-on-surface selection:bg-primary-fixed-dim min-h-screen flex flex-col">
-        {/* <!-- TopNavBar (Shell Suppression: Hidden because Login is Transactional/Focused) -->
+        {/* <!-- TopNavbar (Shell Suppression: Hidden because Login is Transactional/Focused) -->
         <!-- Per instructions: Suppress navigation shell for Login/Sign-up/Transactional screens --> */}
         <main className="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl">
         <div className="max-w-[1100px] w-full flex items-center justify-center gap-xxl">

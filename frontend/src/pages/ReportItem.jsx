@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import NavBar from "../components/NavBar"
+import Navbar from "../components/Navbar"
 import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
@@ -152,7 +152,7 @@ function ReportItem() {
   return (
     <div className="bg-background text-on-surface min-h-screen">
 
-      <NavBar />
+      <Navbar />
 
       <div className="flex">
         <SideBar />
