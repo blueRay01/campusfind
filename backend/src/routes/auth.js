@@ -26,7 +26,7 @@ router.post('/register', async(req, res) => {
     const saltRounds = 10;
 
     try {
-    const { name, student_id, email, password, course } = req.body;
+    const { name, email, password } = req.body;
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email])
     if (existingUser.rows.length > 0) {
         return res.status(400).json({ message: 'Email already registered' })

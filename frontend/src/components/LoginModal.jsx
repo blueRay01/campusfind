@@ -23,7 +23,7 @@ function LoginModal() {
     const handleRegister = async (e) => {
         e.preventDefault()
         try {
-            const response = await api.post('/auth/register', {userName, email, password})
+            const response = await api.post('/auth/register', { name: userName, email, password})
         } catch (error) {
             setError(error.response?.data?.message || 'Something went wrong. Try again')
         }
