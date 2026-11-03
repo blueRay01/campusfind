@@ -106,8 +106,13 @@ function Feed() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await api.get('/posts')
-      setPosts(response.data)
+      try {
+        const response = await api.get('/posts')
+        setPosts(Array.isArray(response.data) ? response.data : [])
+      } catch (err) {
+        console.error('Could not load posts', err)
+        setPosts([])
+      }
     }
     fetchPosts()
   }, [isLoggedIn])

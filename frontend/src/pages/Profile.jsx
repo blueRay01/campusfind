@@ -5,6 +5,7 @@ import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
+import { useAuth } from "../context/AuthContext"
 // Name can only be changed once every 30 days
 
 
@@ -19,6 +20,7 @@ function getDaysUntilNextChange(lastChanged) {
 
 function Profile() {
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState("")
   const [editingName, setEditingName] = useState(false)
@@ -287,7 +289,7 @@ function Profile() {
               <div className="flex flex-col gap-sm sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => navigate("/")}
+                  onClick={() => { logout(); navigate("/feed") }}
                   className={`${smallBtn} bg-surface-container-lowest hover:bg-surface-container-low`}
                 >
                   Log Out

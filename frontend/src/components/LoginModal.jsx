@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import api from "../api/axios"
 
 const cardClass =
-    "relative w-full max-w-[420px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface-container-lowest border-2 border-ink rounded-[28px] shadow-pop-lg p-lg sm:p-xl"
+    "relative w-full max-w-[460px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface-container-lowest border-2 border-ink rounded-[28px] shadow-pop-lg p-lg sm:p-xl"
 const inputClass =
     "pill-input w-full h-12 px-lg rounded-full bg-surface-container-low border-2 border-transparent font-body-lg text-body-lg placeholder:text-on-surface-variant"
 const submitClass =
@@ -13,9 +13,12 @@ const linkClass = "text-ink font-bold underline-offset-4 hover:underline"
 function LoginModal() {
     const { login, authMode, openAuthModal, closeAuthModal } = useAuth()
     const [userName, setUserName] = useState('')
+    const [studentId, setStudentId] = useState('')
+    const [course, setCourse] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -31,10 +34,23 @@ function LoginModal() {
     const handleRegister = async (e) => {
         e.preventDefault()
         try {
-            const response = await api.post('/auth/register', { name: userName, email, password})
+            // Same fields the /register page sends
+            await api.post('/auth/register', { name: userName, student_id: studentId, email, password, course })
+            // Switch to the login form with the email already filled in
+            setPassword('')
+            setError('')
+            setSuccess('Account created! Log in to continue.')
+            openAuthModal('login')
         } catch (error) {
             setError(error.response?.data?.message || 'Something went wrong. Try again')
         }
+    }
+
+    // Clear messages when switching between Log In and Sign Up
+    const switchMode = (mode) => {
+        setError('')
+        setSuccess('')
+        openAuthModal(mode)
     }
 
     const isLogin = authMode === 'login'
@@ -43,6 +59,13 @@ function LoginModal() {
         <p role="alert" className="flex items-center gap-xs font-body-sm text-body-sm text-error">
             <span className="material-symbols-outlined text-[18px]">error</span>
             {error}
+        </p>
+    )
+
+    const successMessage = success && (
+        <p role="status" className="flex items-center gap-sm rounded-2xl border-2 border-ink bg-lime-soft px-md py-sm font-body-sm text-body-sm text-ink">
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+            {success}
         </p>
     )
 
@@ -86,6 +109,8 @@ function LoginModal() {
                         <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant">Log in to post items and claim what's yours.</p>
 
                         <form className="mt-lg flex flex-col gap-md" onSubmit={handleLogin}>
+                            {successMessage}
+
                             <input
                                 type="email"
                                 placeholder="Email"
@@ -110,7 +135,7 @@ function LoginModal() {
 
                             <div className="flex flex-wrap items-center justify-center gap-2 font-body-sm text-body-sm">
                                 <p className="text-on-surface-variant">Don't have an account yet?</p>
-                                <button type="button" onClick={() => {openAuthModal('register')}} className={linkClass}>Sign Up</button>
+                                <button type="button" onClick={() => switchMode('register')} className={linkClass}>Sign Up</button>
                             </div>
                         </form>
                     </>
@@ -120,16 +145,31 @@ function LoginModal() {
                         <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant">Post what you find and claim what you lost.</p>
 
                         <form className="mt-lg flex flex-col gap-md" onSubmit={handleRegister}>
+                            <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
+                                <input
+                                    type="text"
+                                    placeholder="First name"
+                                    aria-label="First name"
+                                    autoComplete="given-name"
+                                    value={userName}
+                                    onChange={(e) => {setUserName(e.target.value); setError('')}}
+                                    className={inputClass} />
+
+                                <input
+                                    type="text"
+                                    placeholder="Course"
+                                    aria-label="Course"
+                                    value={course}
+                                    onChange={(e) => {setCourse(e.target.value); setError('')}}
+                                    className={inputClass} />
+                            </div>
+
                             <input
                                 type="text"
-                                placeholder="Name"
-                                aria-label="Name"
-                                autoComplete="name"
-                                value={userName}
-                                onChange={(e) => {
-                                    setUserName(e.target.value);
-                                    setError('')
-                                }}
+                                placeholder="Student ID No."
+                                aria-label="Student ID number"
+                                value={studentId}
+                                onChange={(e) => {setStudentId(e.target.value); setError('')}}
                                 className={inputClass} />
 
                             <input
@@ -156,7 +196,7 @@ function LoginModal() {
 
                             <div className="flex flex-wrap items-center justify-center gap-2 font-body-sm text-body-sm">
                                 <p className="text-on-surface-variant">Already have an account?</p>
-                                <button type="button" onClick={() => {openAuthModal('login')}} className={linkClass}>Log In</button>
+                                <button type="button" onClick={() => switchMode('login')} className={linkClass}>Log In</button>
                             </div>
                         </form>
                     </>

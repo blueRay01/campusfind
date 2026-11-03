@@ -22,7 +22,7 @@ function Register() {
         try {
             await api.post('/auth/register', {name, student_id: studentId, email, password, course});
             setSuccess(true)
-            setTimeout(() => navigate('/'), 2000)
+            setTimeout(() => navigate('/login'), 2000)
         } catch (error) {
             setError(error.response?.data?.message || "Something went wrong. Try again.")
         }
@@ -113,7 +113,7 @@ function Register() {
 
             <p className="text-center font-body-sm text-body-sm text-on-surface-variant">
                 Already have an account?
-                <Link className="ml-xs font-bold text-ink underline-offset-4 hover:underline" to="/"> Sign In</Link>
+                <Link className="ml-xs font-bold text-ink underline-offset-4 hover:underline" to="/login"> Sign In</Link>
             </p>
         </div>
     </AuthLayout>
