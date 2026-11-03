@@ -62,15 +62,15 @@ function MyPosts() {
   ]
 
   return (
-    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-background text-on-surface">
 
       <Navbar />
 
-      <div className="flex">
+      <div className="flex flex-1">
         <SideBar />
 
-        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xl lg:pt-xxl">
-          <div className="max-w-[1240px] mx-auto">
+        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:px-12 pt-xl lg:pt-xxl">
+          <div className="max-w-[1680px]">
 
             {/* Page header */}
             <div className="mb-xl flex flex-col gap-lg md:flex-row md:items-end md:justify-between">
@@ -109,7 +109,7 @@ function MyPosts() {
             </div>
 
             {/* Cards grid */}
-            <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {filteredPosts.map(post => {
                 const resolved = post.is_resolved === true
                 return (

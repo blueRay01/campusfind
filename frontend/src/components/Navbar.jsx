@@ -42,22 +42,22 @@ function Navbar() {
               location_on
             </span>
           </span>
-          <span className="font-display text-[19px] sm:text-[22px] font-bold tracking-tight text-ink">CampusFind</span>
+          <span className="font-display text-[21px] sm:text-[26px] font-bold tracking-tight text-ink">CampusFind</span>
         </button>
 
         {/* Search: full-width second row on mobile, inline on desktop */}
         <form
           onSubmit={handleSearch}
           role="search"
-          className="order-last w-full lg:order-none lg:w-auto lg:flex-1 lg:max-w-xl lg:ml-lg"
+          className="order-last w-full lg:order-none lg:w-auto lg:flex-1 lg:max-w-2xl lg:ml-xl"
         >
           <label className="relative block">
             <span className="sr-only">Search items</span>
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant pointer-events-none">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[24px] text-on-surface-variant pointer-events-none">
               search
             </span>
             <input
-              className="w-full h-11 pl-11 pr-4 rounded-full border-2 border-ink bg-surface-container-lowest font-body-sm text-body-sm placeholder:text-on-surface-variant outline-none focus:ring-4 focus:ring-lime/60 transition"
+              className="w-full h-12 pl-12 pr-5 rounded-full border-2 border-ink bg-surface-container-lowest text-base placeholder:text-on-surface-variant outline-none focus:ring-4 focus:ring-lime/60 transition"
               placeholder="Search found items..."
               type="text"
               value={searchQuery}
@@ -73,9 +73,9 @@ function Navbar() {
               <button
                 type="button"
                 aria-label="Notifications"
-                className="grid place-items-center w-11 h-11 rounded-full hover:bg-surface-container-high transition-colors active:scale-95"
+                className="grid place-items-center w-12 h-12 rounded-full hover:bg-surface-container-high transition-colors active:scale-95"
               >
-                <span className="material-symbols-outlined text-[26px]">notifications</span>
+                <span className="material-symbols-outlined text-[30px]">notifications</span>
               </button>
 
               <div className="relative" ref={dropdownRef}>
@@ -84,15 +84,15 @@ function Navbar() {
                   aria-label="Account menu"
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen(!isOpen)}
-                  className={`grid place-items-center w-11 h-11 rounded-full border-2 transition-colors active:scale-95 ${
+                  className={`grid place-items-center w-12 h-12 rounded-full border-2 transition-colors active:scale-95 ${
                     isOpen ? "bg-lime border-ink" : "border-transparent hover:bg-surface-container-high"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[26px]">account_circle</span>
+                  <span className="material-symbols-outlined text-[30px]">account_circle</span>
                 </button>
 
                 {isOpen && (
-                  <div className="absolute right-0 top-full mt-sm w-48 overflow-hidden rounded-2xl border-2 border-ink bg-surface-container-lowest shadow-pop">
+                  <div className="absolute right-0 top-full mt-sm w-56 overflow-hidden rounded-2xl border-2 border-ink bg-surface-container-lowest shadow-pop">
                     <button
                       type="button"
                       className="flex w-full items-center gap-sm px-md py-3 text-left font-body-sm text-body-sm hover:bg-lime-soft"
@@ -124,14 +124,14 @@ function Navbar() {
             <>
               <button
                 type="button"
-                className="h-9 px-3 sm:h-10 sm:px-md rounded-full border-2 border-ink font-button font-semibold text-[14px] sm:text-button hover:bg-surface-container-lowest transition-colors"
+                className="h-10 px-4 sm:h-12 sm:px-lg rounded-full border-2 border-ink font-button font-semibold text-[14px] sm:text-button hover:bg-surface-container-lowest transition-colors"
                 onClick={() => { openAuthModal('register') }}
               >
                 Sign Up
               </button>
               <button
                 type="button"
-                className="h-9 px-3 sm:h-10 sm:px-md rounded-full border-2 border-ink bg-lime font-button font-semibold text-[14px] sm:text-button shadow-pop-sm transition-all hover:-translate-y-0.5 hover:shadow-pop active:translate-y-0 active:shadow-none"
+                className="h-10 px-4 sm:h-12 sm:px-lg rounded-full border-2 border-ink bg-lime font-button font-semibold text-[14px] sm:text-button shadow-pop-sm transition-all hover:-translate-y-0.5 hover:shadow-pop active:translate-y-0 active:shadow-none"
                 onClick={() => { openAuthModal('login') }}
               >
                 Log In

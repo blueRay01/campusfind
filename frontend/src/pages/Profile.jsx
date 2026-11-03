@@ -89,15 +89,15 @@ function Profile() {
   ]
 
   return (
-    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-background text-on-surface">
 
       <Navbar />
 
-      <div className="flex">
+      <div className="flex flex-1">
         <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xl lg:pt-xxl">
-          <div className="max-w-[820px] mx-auto">
+        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:px-12 pt-xl lg:pt-xxl">
+          <div className="max-w-[900px]">
 
             {/* Page header */}
             <div className="mb-xl">

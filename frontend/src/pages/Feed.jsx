@@ -31,9 +31,8 @@ const steps = [
   { title: "Reunite", text: "The owner spots it on the feed, claims it, and picks it up." },
 ]
 
-// Shared page padding. Extra left padding on desktop clears the sidebar when logged in.
-const pagePad = (isLoggedIn) =>
-  `px-margin-mobile md:px-8 ${isLoggedIn ? "lg:pl-[120px]" : "lg:pl-margin-desktop"} lg:pr-margin-desktop`
+// Shared page padding (the sidebar sits beside the content, so no extra offset is needed)
+const pagePad = "px-margin-mobile md:px-8 lg:px-12"
 
 
 /* ---------- small decorative pieces ---------- */
@@ -121,15 +120,15 @@ function Feed() {
 
 
  return (
-    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-background text-on-surface">
 
       <Navbar />
 
-      <div className="flex">
+      <div className="flex flex-1">
         <SideBar />
 
-        <main className={`flex-1 min-w-0 ${pagePad(isLoggedIn)} pt-xl lg:pt-xxl`}>
-          <div className="mx-auto max-w-[1240px]">
+        <main className={`flex-1 min-w-0 ${pagePad} pt-xl lg:pt-xxl`}>
+          <div className="max-w-[1680px]">
 
             {/* ---------- Landing hero (logged-out visitors only) ---------- */}
             {showLanding && (
@@ -249,8 +248,8 @@ function Feed() {
                     </p>
                   )}
                 </div>
-                <p className="flex items-center gap-sm font-body-sm text-body-sm text-on-surface-variant">
-                  <span className="h-2.5 w-2.5 rounded-full border-2 border-ink bg-lime" />
+                <p className="flex items-center gap-sm text-base text-on-surface-variant">
+                  <span className="h-3 w-3 rounded-full border-2 border-ink bg-lime" />
                   {visiblePosts.length} item{visiblePosts.length === 1 ? "" : "s"} on the board
                 </p>
               </div>
@@ -271,7 +270,7 @@ function Feed() {
                         role="tab"
                         aria-selected={active}
                         onClick={() => setActiveCategory(cat)}
-                        className={`h-10 shrink-0 rounded-full border-2 px-md font-body-sm text-body-sm transition-all ${
+                        className={`h-12 shrink-0 rounded-full border-2 px-lg text-base font-medium transition-all ${
                           active
                             ? "border-ink bg-lime font-bold shadow-pop-sm"
                             : "border-ink/20 hover:border-ink"
@@ -288,7 +287,7 @@ function Feed() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="h-10 appearance-none rounded-full border-2 border-ink bg-surface-container-lowest pl-md pr-10 font-body-sm text-body-sm font-semibold outline-none focus:ring-4 focus:ring-lime/60"
+                    className="h-12 appearance-none rounded-full border-2 border-ink bg-surface-container-lowest pl-lg pr-11 text-base font-semibold outline-none focus:ring-4 focus:ring-lime/60"
                   >
                     {sortOptions.map(opt => (
                       <option key={opt.value} value={opt.value}>Sort: {opt.label}</option>
@@ -302,7 +301,7 @@ function Feed() {
 
               {/* Cards grid */}
               {visiblePosts.length > 0 ? (
-                <div className="mt-xl grid grid-cols-2 gap-x-md gap-y-xl sm:gap-x-lg lg:grid-cols-3 xl:grid-cols-4">
+                <div className="mt-xl grid grid-cols-2 gap-x-md gap-y-xl sm:gap-x-lg lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                   {visiblePosts.map(post => (
                     <ItemCard
                       key={post.id}

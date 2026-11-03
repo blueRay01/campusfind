@@ -163,15 +163,15 @@ function ReportItem() {
   const label = "block mb-sm font-label-caps text-label-caps uppercase text-on-surface-variant"
 
   return (
-    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-background text-on-surface">
 
       <Navbar />
 
-      <div className="flex">
+      <div className="flex flex-1">
         <SideBar />
 
-        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xl lg:pt-xxl">
-          <div className="max-w-[1140px] mx-auto">
+        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:px-12 pt-xl lg:pt-xxl">
+          <div className="max-w-[1280px]">
 
             {/* Page header */}
             <div className="mb-xl">

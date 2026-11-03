@@ -17,52 +17,53 @@ function SideBar() {
   return (
     <>
       {isLoggedIn && (
-        <aside className="hidden lg:flex flex-col items-center fixed left-0 top-[82px] h-[calc(100vh-82px)] w-20 z-40 border-r-2 border-ink bg-background py-lg">
-
-          {/* Nav links */}
-          <nav className="flex-1 flex flex-col items-center gap-md pt-md" aria-label="Main">
+        <aside className="sticky top-[90px] z-30 hidden h-[calc(100vh-90px)] w-24 shrink-0 flex-col items-center self-start border-r-2 border-ink bg-background py-lg lg:flex">
+          <nav className="flex flex-col items-center gap-sm" aria-label="Main">
             {navItems.map((item) => {
               const isActive = item.matches.some(prefix => location.pathname.startsWith(prefix))
               return (
                 <button
                   key={item.label}
                   type="button"
-                  title={item.label}
-                  aria-label={item.label}
                   aria-current={isActive ? "page" : undefined}
                   onClick={() => navigate(item.path)}
-                  className={`grid place-items-center w-12 h-12 rounded-2xl border-2 transition-all ${
+                  className={`flex w-[76px] flex-col items-center gap-1 rounded-2xl border-2 py-2 transition-all ${
                     isActive
-                      ? "bg-lime border-ink shadow-pop-sm"
-                      : "border-transparent text-on-surface-variant hover:text-ink hover:bg-surface-container-high"
+                      ? "border-ink bg-lime text-ink shadow-pop-sm"
+                      : "border-transparent text-on-surface-variant hover:bg-surface-container-high hover:text-ink"
                   }`}
                 >
                   <span
-                    className="material-symbols-outlined text-[26px]"
+                    className="material-symbols-outlined text-[28px]"
                     style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
                   >
                     {item.icon}
                   </span>
+                  <span className="text-[12px] font-semibold leading-none">{item.label}</span>
                 </button>
               )
             })}
+
+            <span className="my-sm h-0.5 w-10 rounded-full bg-ink/15" aria-hidden="true" />
+
+            {/* Report button */}
+            <button
+              type="button"
+              onClick={() => navigate("/report")}
+              className="group flex flex-col items-center gap-1.5"
+            >
+              <span
+                className={`grid h-14 w-14 place-items-center rounded-full border-2 border-ink transition-all ${
+                  onReport
+                    ? "bg-ink text-lime"
+                    : "bg-violet shadow-pop-sm group-hover:-translate-y-0.5 group-hover:shadow-pop"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[30px]">add</span>
+              </span>
+              <span className="text-[12px] font-semibold leading-none text-ink">Report</span>
+            </button>
           </nav>
-
-          {/* Report button */}
-          <button
-            type="button"
-            title="Report a found item"
-            aria-label="Report a found item"
-            onClick={() => navigate("/report")}
-            className={`grid place-items-center w-12 h-12 rounded-full border-2 border-ink transition-all ${
-              onReport
-                ? "bg-ink text-lime"
-                : "bg-violet shadow-pop-sm hover:-translate-y-0.5 hover:shadow-pop"
-            }`}
-          >
-            <span className="material-symbols-outlined">add</span>
-          </button>
-
         </aside>
       )}
     </>

@@ -3,10 +3,10 @@ function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="relative z-10 mt-xxl border-t-2 border-ink bg-background px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xxl pb-32 lg:pb-xl overflow-hidden">
+    <footer className="relative z-10 mt-xxl border-t-2 border-ink bg-background px-margin-mobile md:px-8 lg:px-12 pt-xl pb-32 lg:pb-lg overflow-hidden">
       <p
         aria-hidden="true"
-        className="font-display font-extrabold text-ink leading-[0.9] pb-2 tracking-[-0.05em] text-[clamp(56px,14vw,200px)] select-none"
+        className="font-display font-extrabold text-ink leading-[0.9] pb-2 tracking-[-0.05em] text-[clamp(48px,8vw,128px)] select-none"
       >
         CampusFind
       </p>
