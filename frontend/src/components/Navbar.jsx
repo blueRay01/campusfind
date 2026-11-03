@@ -29,7 +29,7 @@ function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-ink bg-background/90 backdrop-blur-md">
-      <div className="flex flex-wrap lg:flex-nowrap items-center gap-x-sm sm:gap-x-md gap-y-sm px-margin-mobile md:px-8 lg:px-margin-desktop py-sm lg:py-0 lg:h-20">
+      <div className="flex flex-wrap lg:flex-nowrap items-center gap-x-sm sm:gap-x-md gap-y-sm px-margin-mobile md:px-8 lg:px-12 py-sm lg:py-0 lg:h-[88px]">
 
         {/* Logo */}
         <button
@@ -37,8 +37,8 @@ function Navbar() {
           onClick={() => navigate("/feed")}
           className="flex items-center gap-sm shrink-0 rounded-full"
         >
-          <span className="grid place-items-center w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-lime border-2 border-ink">
-            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span className="grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-lime border-2 border-ink">
+            <span className="material-symbols-outlined text-[22px] sm:text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
               location_on
             </span>
           </span>
