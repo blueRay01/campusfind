@@ -12,45 +12,56 @@ function SideBar() {
     { icon: "inventory_2", label: "My Claims", path: "/my-claims", matches: ["/my-claims"] },
   ]
 
+  const onReport = location.pathname.startsWith("/report")
+
   return (
     <>
       {isLoggedIn && (
-        <aside className="hidden lg:flex flex-col items-center h-[calc(100vh-100px)] fixed left-0 top-[100px] w-20 bg-surface text-on-surface pt-6 z-40">
+        <aside className="hidden lg:flex flex-col items-center fixed left-0 top-[82px] h-[calc(100vh-82px)] w-20 z-40 border-r-2 border-ink bg-background py-lg">
 
           {/* Nav links */}
-          <nav className="flex-1 flex flex-col items-center gap-20 pt-4 mt-20">
+          <nav className="flex-1 flex flex-col items-center gap-md pt-md" aria-label="Main">
             {navItems.map((item) => {
               const isActive = item.matches.some(prefix => location.pathname.startsWith(prefix))
               return (
                 <button
                   key={item.label}
+                  type="button"
+                  title={item.label}
+                  aria-label={item.label}
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => navigate(item.path)}
-                  className="flex flex-col items-center gap-1 text-on-surface hover:text-primary transition-colors"
+                  className={`grid place-items-center w-12 h-12 rounded-2xl border-2 transition-all ${
+                    isActive
+                      ? "bg-lime border-ink shadow-pop-sm"
+                      : "border-transparent text-on-surface-variant hover:text-ink hover:bg-surface-container-high"
+                  }`}
                 >
-                  <span className="material-symbols-outlined text-[30px]">
+                  <span
+                    className="material-symbols-outlined text-[26px]"
+                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                  >
                     {item.icon}
                   </span>
-                  <span className={`h-[2px] w-5 rounded-full transition-all ${isActive ? "bg-primary" : "bg-transparent"}`} />
                 </button>
               )
             })}
           </nav>
 
           {/* Report button */}
-          <div className="pb-8">
-            <button
-              onClick={() => navigate("/report")}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                location.pathname.startsWith("/report")
-                  ? "bg-black border border-black"
-                  : "border border-outline hover:bg-surface-container-high"
-              }`}
-            >
-              <span className={`material-symbols-outlined ${location.pathname.startsWith("/report") ? "text-white" : ""}`}>
-                add
-              </span>
-            </button>
-          </div>
+          <button
+            type="button"
+            title="Report a found item"
+            aria-label="Report a found item"
+            onClick={() => navigate("/report")}
+            className={`grid place-items-center w-12 h-12 rounded-full border-2 border-ink transition-all ${
+              onReport
+                ? "bg-ink text-lime"
+                : "bg-violet shadow-pop-sm hover:-translate-y-0.5 hover:shadow-pop"
+            }`}
+          >
+            <span className="material-symbols-outlined">add</span>
+          </button>
 
         </aside>
       )}

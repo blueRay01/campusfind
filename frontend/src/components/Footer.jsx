@@ -1,18 +1,31 @@
 function Footer() {
   const links = ["Support", "Legal", "Privacy", "Contact"]
+  const year = new Date().getFullYear()
 
   return (
-    <footer className="w-full py-8 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-low border-t border-outline-variant mt-xxl relative z-10">
-      <div className="flex flex-col items-center md:items-start">
-        <span className="font-headline-lg text-headline-lg-mobile text-primary">CampusFind</span>
-        <p className="font-body-sm text-body-sm text-secondary">© 2024 CampusFind. Institutional Item Network.</p>
-      </div>
-      <div className="flex gap-6">
-        {links.map(link => (
-          <a key={link} href="#" className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity opacity-80 hover:opacity-100">
-            {link}
-          </a>
-        ))}
+    <footer className="relative z-10 mt-xxl border-t-2 border-ink bg-background px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xxl pb-32 lg:pb-xl overflow-hidden">
+      <p
+        aria-hidden="true"
+        className="font-display font-extrabold text-ink leading-[0.9] pb-2 tracking-[-0.05em] text-[clamp(56px,14vw,200px)] select-none"
+      >
+        CampusFind
+      </p>
+
+      <div className="mt-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+        <p className="font-body-sm text-body-sm text-on-surface-variant">
+          © {year} CampusFind. Made for students, by students.
+        </p>
+        <nav className="flex flex-wrap gap-x-lg gap-y-sm" aria-label="Footer">
+          {links.map(link => (
+            <a
+              key={link}
+              href="#"
+              className="font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-ink hover:underline underline-offset-4"
+            >
+              {link}
+            </a>
+          ))}
+        </nav>
       </div>
     </footer>
   )

@@ -47,143 +47,197 @@ function MyPosts() {
     activeTab === "Active" ? post.is_resolved === false : post.is_resolved === true
   )
 
+  const activeCount = posts.filter(p => p.is_resolved === false).length
+  const resolvedCount = posts.filter(p => p.is_resolved === true).length
+
+  // Display only: "Nov 2, 2026" instead of the raw timestamp
+  const formatDate = (value) => {
+    const date = new Date(value)
+    return isNaN(date) ? value : date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+  }
+
+  const tabs = [
+    { key: "Active", count: activeCount },
+    { key: "Resolved", count: resolvedCount },
+  ]
+
   return (
-    <div className="bg-background text-on-surface min-h-screen">
+    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
 
       <Navbar />
 
       <div className="flex">
         <SideBar />
 
-        <main className="flex-1 pl-[150px] pr-[120px] py-[120px] min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
-          <div>
+        <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:pl-[120px] lg:pr-margin-desktop pt-xl lg:pt-xxl">
+          <div className="max-w-[1240px] mx-auto">
 
             {/* Page header */}
-            <div className="flex justify-between items-end mb-xl">
+            <div className="mb-xl flex flex-col gap-lg md:flex-row md:items-end md:justify-between">
               <div>
-                <h2 className="font-headline-lg text-headline-lg text-black">My Reported Items</h2>
-                <p className="text-black/60 font-body-lg mt-xs">Manage the items you've found or lost on campus.</p>
+                <h1 className="font-display text-[clamp(36px,5vw,60px)] font-bold leading-[1] tracking-[-0.03em] text-ink">
+                  My Reported Items
+                </h1>
+                <p className="mt-sm font-body-lg text-body-lg text-on-surface-variant">
+                  Manage the items you've found on campus.
+                </p>
               </div>
 
               {/* Tab toggle */}
-              <div className="flex bg-surface-container-low rounded-full p-xs">
-                <button
-                  onClick={() => setActiveTab("Active")}
-                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Active" ? "bg-white shadow-sm text-black" : "text-black/60 hover:text-black"}`}
-                >
-                  Active ({posts.filter(p => p.is_resolved === false).length})
-                </button>
-                <button
-                  onClick={() => setActiveTab("Resolved")}
-                  className={`px-md py-sm rounded-full font-button text-button transition-colors ${activeTab === "Resolved" ? "bg-white shadow-sm text-black" : "text-black/60 hover:text-black"}`}
-                >
-                  Resolved ({posts.filter(p => p.is_resolved === true).length})
-                </button>
+              <div role="tablist" className="flex w-full rounded-full border-2 border-ink bg-surface-container-lowest p-1 sm:w-auto">
+                {tabs.map(tab => {
+                  const active = activeTab === tab.key
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`flex flex-1 items-center justify-center gap-sm rounded-full px-lg py-2 font-button text-button transition-colors sm:flex-none ${
+                        active ? "bg-lime text-ink" : "text-on-surface-variant hover:text-ink"
+                      }`}
+                    >
+                      {tab.key}
+                      <span className={`grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[12px] font-bold ${active ? "bg-ink text-lime" : "bg-surface-container"}`}>
+                        {tab.count}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
             {/* Cards grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xxl">
-              {filteredPosts.map(post => (
-                <div
-                  key={post.id}
-                  className={`bg-background cute-card-shadow overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)] duration-300 group ${post.is_resolved === true ? "opacity-80 hover:opacity-100" : ""}`}
-                >
-                  {/* Image */}
-                  <div className={`relative h-80 overflow-hidden ${post.is_resolved === true ? "grayscale group-hover:grayscale-0 transition-all duration-500" : ""}`}>
-                    <img
-                      src={post.image_url}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute top-md left-md">
-                      <span className={`px-md py-1 font-label-caps text-label-caps rounded-full ${post.is_resolved === false ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-secondary-container text-on-secondary-container"}`}>
-                        {post.is_resolved ? "Resolved" : "Active"}
-                      </span>
-                    </div>
-                    {post.is_resolved === true && (
-                      <div className="absolute inset-0 bg-black/10 pointer-events-none" />
-                    )}
-                  </div>
-
-                  {/* Card body */}
-                  <div className="p-lg">
-                    <div className="flex justify-between items-start mb-sm">
-                      <h3 className="font-headline-md text-headline-md text-black">{post.title}</h3>
-                      <span className="text-black/60">
-                        <span className="material-symbols-outlined text-[18px]">
-                          {post.is_resolved === true ? "check_circle" : "more_vert"}
-                        </span>
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col gap-xs mb-lg">
-                      <div className="flex items-center gap-xs text-black/60 font-body-lg">
-                        <span className="material-symbols-outlined text-[16px]">location_on</span>
-                        {`${post.building}${post.room ? `, ${post.room}`:''}`}
-                      </div>
-                      <div className="flex items-center gap-xs text-black/60 font-body-lg">
-                        <span className="material-symbols-outlined text-[16px]">calendar_today</span>
-                        {post.created_at}
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    {post.is_resolved === false ? (
-                      <div className="pt-md border-t border-surface-container-low flex flex-col gap-sm">
-                        {post.is_claimed && (
-                          <button
-                            onClick={() => handleResolve(post.id)}
-                            className="w-full py-sm bg-black text-white font-button text-button hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                          >
-                            <span className="material-symbols-outlined text-[18px]">task_alt</span>
-                            Confirm Handoff
-                          </button>
-                        )}
-                        <div className="grid grid-cols-3 gap-sm">
-                          <button
-                            onClick={() => navigate(`/report/${post.id}`)}
-                            className="flex flex-col items-center gap-1 py-sm hover:bg-surface-container-low transition-colors group/btn"
-                          >
-                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-black">edit</span>
-                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-black">EDIT</span>
-                          </button>
-                          <button onClick={() => handleDelete(post.id)} className="flex flex-col items-center gap-1 py-sm hover:bg-error-container transition-colors group/btn">
-                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-error">delete</span>
-                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-error">DELETE</span>
-                          </button>
-                          <button
-                            onClick={() => navigate(`/item/${post.id}`)}
-                            className="flex flex-col items-center gap-1 py-sm hover:bg-primary-fixed transition-colors group/btn"
-                          >
-                            <span className="material-symbols-outlined text-black/60 group-hover/btn:text-black">visibility</span>
-                            <span className="font-label-caps text-label-caps text-black/60 group-hover/btn:text-black">DETAILS</span>
-                          </button>
+            <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredPosts.map(post => {
+                const resolved = post.is_resolved === true
+                return (
+                  <article
+                    key={post.id}
+                    className={`group flex flex-col overflow-hidden rounded-[24px] border-2 border-ink bg-surface-container-lowest transition-all duration-300 hover:-translate-y-1 hover:shadow-pop ${
+                      resolved ? "opacity-80 hover:opacity-100" : ""
+                    }`}
+                  >
+                    {/* Image */}
+                    <div className={`relative aspect-[4/3] overflow-hidden border-b-2 border-ink bg-violet-soft ${resolved ? "grayscale transition-all duration-500 group-hover:grayscale-0" : ""}`}>
+                      {post.image_url ? (
+                        <img
+                          src={post.image_url}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center">
+                          <span className="material-symbols-outlined text-[44px] text-ink/40">image</span>
                         </div>
+                      )}
+
+                      <div className="absolute left-3 top-3 flex flex-wrap gap-xs">
+                        <span className={`rounded-full border-2 border-ink px-3 py-0.5 font-label-caps text-label-caps uppercase ${resolved ? "bg-surface-container-lowest" : "bg-lime"}`}>
+                          {resolved ? "Resolved" : "Active"}
+                        </span>
+                        {!resolved && post.is_claimed && (
+                          <span className="rounded-full border-2 border-ink bg-violet px-3 py-0.5 font-label-caps text-label-caps uppercase">
+                            Claimed
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="pt-md border-t border-surface-container-low flex justify-center">
-                        <span className="font-label-caps text-label-caps text-black/60">Item Claimed & Verified</span>
+                    </div>
+
+                    {/* Card body */}
+                    <div className="flex flex-1 flex-col p-md">
+                      <div className="flex items-start justify-between gap-sm">
+                        <h3 className="font-headline-md text-headline-md text-ink line-clamp-2">{post.title}</h3>
+                        {resolved && (
+                          <span className="material-symbols-outlined shrink-0 text-[22px] text-ink" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            check_circle
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+
+                      <div className="mt-sm flex flex-col gap-xs font-body-sm text-body-sm text-on-surface-variant">
+                        <p className="flex items-start gap-xs">
+                          <span className="material-symbols-outlined shrink-0 text-[18px]">location_on</span>
+                          <span className="line-clamp-2">{`${post.building}${post.room ? `, ${post.room}`:''}`}</span>
+                        </p>
+                        <p className="flex items-center gap-xs">
+                          <span className="material-symbols-outlined shrink-0 text-[18px]">calendar_today</span>
+                          {formatDate(post.created_at)}
+                        </p>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="mt-auto pt-md">
+                        {!resolved ? (
+                          <div className="flex flex-col gap-sm border-t-2 border-ink/10 pt-md">
+                            {post.is_claimed && (
+                              <button
+                                type="button"
+                                onClick={() => handleResolve(post.id)}
+                                className="flex h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-ink bg-ink font-button text-button text-lime transition-transform hover:-translate-y-0.5"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                                Confirm Handoff
+                              </button>
+                            )}
+                            <div className="grid grid-cols-3 gap-xs">
+                              <button
+                                type="button"
+                                onClick={() => navigate(`/report/${post.id}`)}
+                                className="flex flex-col items-center gap-0.5 rounded-2xl py-sm text-on-surface-variant transition-colors hover:bg-lime-soft hover:text-ink"
+                              >
+                                <span className="material-symbols-outlined text-[22px]">edit</span>
+                                <span className="text-[11px] font-bold uppercase tracking-wide">Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(post.id)}
+                                className="flex flex-col items-center gap-0.5 rounded-2xl py-sm text-on-surface-variant transition-colors hover:bg-error-container hover:text-error"
+                              >
+                                <span className="material-symbols-outlined text-[22px]">delete</span>
+                                <span className="text-[11px] font-bold uppercase tracking-wide">Delete</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => navigate(`/item/${post.id}`)}
+                                className="flex flex-col items-center gap-0.5 rounded-2xl py-sm text-on-surface-variant transition-colors hover:bg-violet-soft hover:text-ink"
+                              >
+                                <span className="material-symbols-outlined text-[22px]">visibility</span>
+                                <span className="text-[11px] font-bold uppercase tracking-wide">Details</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="flex items-center justify-center gap-xs border-t-2 border-ink/10 pt-md font-label-caps text-label-caps uppercase text-on-surface-variant">
+                            <span className="material-symbols-outlined text-[18px]">verified</span>
+                            Item Claimed & Verified
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
 
               {/* CTA card */}
-              <div
+              <button
+                type="button"
                 onClick={() => navigate("/report")}
-                className="lg:col-span-4 mt-xl p-xxl bg-background border border-dashed border-black/20 flex flex-col items-center justify-center text-center group hover:border-black transition-all cursor-pointer"
+                className={`group col-span-full flex flex-col items-center justify-center rounded-[28px] border-2 border-dashed border-ink/30 bg-surface-container-lowest/50 px-lg py-xxl text-center transition-all hover:border-ink hover:bg-surface-container-lowest ${filteredPosts.length ? "mt-lg" : ""}`}
               >
-                <div className="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center mb-lg group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-black text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
-                </div>
-                <h3 className="font-headline-lg text-headline-lg text-black mb-sm">Found something else?</h3>
-                <p className="text-black/60 font-body-lg max-w-md mb-xl">Help your fellow students by reporting items you find around campus. It only takes a minute to make someone's day.</p>
-                <button className="px-xl py-lg bg-black text-white font-button text-button rounded-full hover:opacity-90 active:scale-95 transition-all">
+                <span className="mb-lg grid h-20 w-20 place-items-center rounded-3xl border-2 border-ink bg-lime transition-transform group-hover:-rotate-6 group-hover:scale-110">
+                  <span className="material-symbols-outlined text-[40px] text-ink">add</span>
+                </span>
+                <span className="font-display text-[clamp(26px,3vw,34px)] font-bold tracking-tight text-ink">Found something else?</span>
+                <span className="mt-sm max-w-md font-body-lg text-body-lg text-on-surface-variant">
+                  Help your fellow students by reporting items you find around campus. It only takes a minute to make someone's day.
+                </span>
+                <span className="mt-xl inline-flex h-12 items-center gap-sm rounded-full border-2 border-ink bg-ink px-lg font-button text-button text-background shadow-pop-sm transition-all group-hover:-translate-y-0.5 group-hover:bg-lime group-hover:text-ink">
                   Report a New Item
-                </button>
-              </div>
+                  <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                </span>
+              </button>
             </div>
 
           </div>

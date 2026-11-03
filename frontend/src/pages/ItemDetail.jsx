@@ -60,79 +60,128 @@ function ItemDetail() {
     }
   }
 
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>{error}</p>
+  if (loading) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <p className="flex items-center gap-sm font-body-lg text-body-lg text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin">progress_activity</span>
+          Loading item...
+        </p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-margin-mobile">
+        <div className="flex max-w-md flex-col items-center rounded-[28px] border-2 border-ink bg-surface-container-lowest p-xl text-center shadow-pop">
+          <span className="mb-md grid h-16 w-16 place-items-center rounded-2xl border-2 border-ink bg-error-container">
+            <span className="material-symbols-outlined text-[32px] text-error">error</span>
+          </span>
+          <p className="font-body-lg text-body-lg text-ink">{error}</p>
+          <button
+            type="button"
+            onClick={() => navigate("/feed")}
+            className="mt-lg h-11 rounded-full border-2 border-ink bg-lime px-lg font-button text-button shadow-pop-sm"
+          >
+            Back to feed
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const status = post.is_resolved
+    ? { label: "Resolved", dot: "bg-surface-container-highest" }
+    : claimed
+      ? { label: "Pending Confirmation", dot: "bg-violet" }
+      : { label: "Awaiting Claim", dot: "bg-lime animate-pulse" }
+
+  // Display only: make the messenger link clickable
+  const messengerHref = post.messenger_link
+    ? (post.messenger_link.startsWith("http") ? post.messenger_link : `https://${post.messenger_link}`)
+    : null
 
   return (
-    <div className="bg-background text-on-surface min-h-screen">
+    <div className="bg-background text-on-surface min-h-screen overflow-x-clip">
 
       <Navbar />
 
       <div className="flex">
         <SideBar/>
 
-        <main className="flex-1 py-margin-desktop min-h-[calc(100vh-64px)] bg-background transition-all duration-300">
-          <div>
+        <main className={`flex-1 min-w-0 px-margin-mobile md:px-8 ${isLoggedIn ? "lg:pl-[120px]" : "lg:pl-margin-desktop"} lg:pr-margin-desktop pt-lg lg:pt-xl`}>
+          <div className="max-w-[1200px] mx-auto">
 
-            
+            {/* Back button */}
+            <button
+              type="button"
+              onClick={() => navigate("/feed")}
+              className="group mb-lg inline-flex h-10 items-center gap-xs rounded-full border-2 border-ink bg-surface-container-lowest pl-2 pr-md font-button text-button transition-colors hover:bg-lime"
+            >
+              <span className="material-symbols-outlined text-[22px] transition-transform group-hover:-translate-x-0.5">chevron_left</span>
+              Back to feed
+            </button>
 
             {/* Main split: image left, details right */}
-            <div className="flex flex-col lg:flex-row gap-40 pl-[150px]">
+            <div className="grid grid-cols-1 gap-xl lg:grid-cols-[1.1fr_1fr] lg:gap-xxl">
 
-              {/* Left — image */}
-              <div className="w-full lg:w-[40%] shrink-0 flex flex-row items-start gap-lg">
-                {/* Back button */}
-                <button
-                  onClick={() => navigate("/feed")}
-                  className="flex items-center text-on-surface-variant hover:text-primary transition-colors group mb-xl"
-                >
-                  <span className="material-symbols-outlined mr-xs text-[30px] group-hover:-translate-x-1 transition-transform">chevron_left</span>
-                </button>
-
-                <div
-                  onClick={() => setLightboxOpen(true)}
-                  className="group relative h-72 lg:h-[500px] w-full overflow-hidden cursor-zoom-in bg-surface-container-high border border-black"
-                >
-                  <img
-                    alt={post.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    src={post.image_url}
-                  />
-                  {/* Hover overlay signaling the image is clickable */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                    <div className="flex items-center gap-xs px-md py-sm rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+              {/* Left: image */}
+              <div className="lg:sticky lg:top-[110px] lg:self-start">
+                {post.image_url ? (
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    aria-label="View full size photo"
+                    className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-[28px] border-2 border-ink bg-violet-soft shadow-pop lg:aspect-square"
+                  >
+                    <img
+                      alt={post.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      src={post.image_url}
+                    />
+                    <span className="absolute bottom-md right-md inline-flex items-center gap-xs rounded-full border-2 border-ink bg-surface-container-lowest px-md py-1.5 font-button text-button shadow-pop-sm transition-transform group-hover:-translate-y-0.5">
                       <span className="material-symbols-outlined text-[18px]">fullscreen</span>
-                      <span className="font-button text-button">View full size</span>
-                    </div>
+                      View full size
+                    </span>
+                  </button>
+                ) : (
+                  <div className="grid aspect-[4/3] w-full place-items-center rounded-[28px] border-2 border-ink bg-violet-soft lg:aspect-square">
+                    <span className="material-symbols-outlined text-[64px] text-ink/40">image</span>
                   </div>
-                </div>
+                )}
               </div>
 
-              {/* Right — details */}
-              <div className="flex-1 flex flex-col">
+              {/* Right: details */}
+              <div className="flex flex-col">
 
-                <span className="text-black/60 font-body-sm mb-sm">
-                  {post.category} · FOUND
-                </span>
+                <div className="flex flex-wrap gap-sm">
+                  {post.category && (
+                    <span className="rounded-full border-2 border-ink bg-violet px-3 py-0.5 font-label-caps text-label-caps uppercase">{post.category}</span>
+                  )}
+                  <span className="rounded-full border-2 border-ink bg-lime px-3 py-0.5 font-label-caps text-label-caps uppercase">Found</span>
+                </div>
 
-                <h1 className="font-headline-lg text-headline-lg text-black uppercase mb-md">
+                <h1 className="mt-md font-display text-[clamp(34px,4.6vw,58px)] font-bold leading-[1] tracking-[-0.03em] text-ink">
                   {post.title}
                 </h1>
 
-                <p className="text-black/60 font-body-sm mb-xl">
+                <p className="mt-sm flex items-center gap-xs font-body-sm text-body-sm text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[18px]">calendar_today</span>
                   Found on {formatDate(post.created_at)}
                 </p>
 
                 {post.description && (
-                  <div className="mb-xl">
-                    <h3 className="font-body-sm text-black/60 mb-sm">Description</h3>
-                    <p className="text-black font-body-lg leading-relaxed whitespace-pre-line">
+                  <div className="mt-lg">
+                    <h3 className="mb-sm font-label-caps text-label-caps uppercase text-on-surface-variant">Description</h3>
+                    <p className="whitespace-pre-line font-body-lg text-body-lg font-normal leading-relaxed text-ink">
                       {displayedDescription}
                     </p>
                     {isLongDescription && (
                       <button
+                        type="button"
                         onClick={() => setDescExpanded(!descExpanded)}
-                        className="mt-sm font-button text-button text-black/70 hover:text-black underline underline-offset-2 transition-colors"
+                        className="mt-sm font-button text-button text-ink underline underline-offset-4 hover:text-on-surface-variant"
                       >
                         {descExpanded ? "Show less" : "Read more"}
                       </button>
@@ -140,94 +189,110 @@ function ItemDetail() {
                   </div>
                 )}
 
-                {/* Location + reporter — plain rows, no card */}
-                <div className="flex flex-col gap-lg mb-xl">
-                  <div className="flex items-start gap-md">
-                    <span className="material-symbols-outlined text-black/60 text-[20px] mt-[2px]">location_on</span>
-                    <div>
-                      <p className="font-body-sm text-black mb-xs">Found at</p>
-                      <p className="font-headline-md text-headline-md text-black">{post.building}</p>
-                      {post.room && <p className="text-black/60 font-body-sm">{post.room}</p>}
+                {/* Location + reporter */}
+                <div className="mt-xl grid grid-cols-1 gap-sm sm:grid-cols-2">
+                  <div className="flex items-start gap-md rounded-[20px] border-2 border-ink bg-surface-container-lowest p-md">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-ink bg-lime">
+                      <span className="material-symbols-outlined text-[20px]">location_on</span>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">Found at</p>
+                      <p className="mt-0.5 font-body-lg text-body-lg font-semibold text-ink">{post.building}</p>
+                      {post.room && <p className="font-body-sm text-body-sm text-on-surface-variant">{post.room}</p>}
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-md">
-                    <span className="material-symbols-outlined text-black/60 text-[20px] mt-[2px]">person</span>
-                    <div>
-                      <p className="font-body-sm text-black mb-xs">Reported by</p>
-                      <p className="font-headline-md text-headline-md text-black">{post.reporter_name}</p>
-                      <p className="text-black/60 font-body-sm">Verified Student Finder</p>
+                  <div className="flex items-start gap-md rounded-[20px] border-2 border-ink bg-surface-container-lowest p-md">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-ink bg-violet">
+                      <span className="material-symbols-outlined text-[20px]">person</span>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">Reported by</p>
+                      <p className="mt-0.5 font-body-lg text-body-lg font-semibold text-ink">{post.reporter_name}</p>
+                      <p className="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
+                        <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                        Verified Student Finder
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <hr className="border-outline-variant mb-xl" />
+                {/* Status + claim */}
+                <div className="mt-xl rounded-[24px] border-2 border-ink bg-surface-container-lowest p-lg">
+                  <div className="flex items-center gap-md">
+                    <span className={`h-3.5 w-3.5 rounded-full border-2 border-ink ${status.dot}`} />
+                    <span className="font-headline-md text-headline-md text-ink">{status.label}</span>
+                  </div>
 
-                {/* Status */}
-                <div className="flex items-center gap-md mb-lg">
-                  <div className={`h-3 w-3 rounded-full ${post.is_resolved ? "bg-secondary" : "bg-primary animate-pulse"}`}></div>
-                  <span className="font-headline-md text-headline-md text-black">
-                    {post.is_resolved ? "Resolved" : claimed ? "Pending Confirmation" : "Awaiting Claim"}
-                  </span>
-                </div>
-
-                {/* Claim button — icon-led, modern pill */}
-                <button
-                  onClick={handleClaim}
-                  disabled={claimed}
-                  aria-label={claimed ? "Claim request sent" : "Claim this item"}
-                  className={`group/btn relative w-full sm:w-fit px-xl py-sm rounded-full font-button text-button flex justify-center items-center gap-sm transition-all duration-200 active:scale-95 shadow-sm ${
-                    claimed
-                      ? "bg-black/5 text-black/40 cursor-not-allowed shadow-none"
-                      : "bg-black text-white hover:shadow-lg hover:-translate-y-[1px]"
-                  }`}
-                >
-                  <span
-                    className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
-                      claimed ? "" : "group-hover/btn:rotate-[-8deg]"
+                  <button
+                    type="button"
+                    onClick={handleClaim}
+                    disabled={claimed}
+                    aria-label={claimed ? "Claim request sent" : "Claim this item"}
+                    className={`group/btn mt-lg flex h-14 w-full items-center justify-center gap-sm rounded-full border-2 font-button text-body-lg font-bold transition-all ${
+                      claimed
+                        ? "cursor-not-allowed border-ink/20 bg-surface-container text-on-surface-variant"
+                        : "border-ink bg-lime text-ink shadow-pop hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-y-0 active:shadow-none"
                     }`}
                   >
-                    {claimed ? "check_circle" : "front_hand"}
-                  </span>
-                  <span>{claimed ? "Request Sent" : "Claim item"}</span>
-                </button>
+                    <span
+                      className={`material-symbols-outlined text-[22px] transition-transform duration-200 ${claimed ? "" : "group-hover/btn:-rotate-12"}`}
+                    >
+                      {claimed ? "check_circle" : "front_hand"}
+                    </span>
+                    <span>{claimed ? "Request Sent" : "Claim item"}</span>
+                  </button>
+                  {!isLoggedIn && !claimed && (
+                    <p className="mt-sm text-center font-body-sm text-body-sm text-on-surface-variant">You'll need to log in first.</p>
+                  )}
+                </div>
 
-                {/* Finder details — appears after claiming */}
+                {/* Finder details: appears after claiming */}
                 {claimed && isLoggedIn && (
-                  <div className="mt-xl pt-xl border-t border-outline-variant">
+                  <div className="mt-lg rounded-[24px] border-2 border-ink bg-violet-soft p-lg">
                     {post.handed_to_security ? (
-                      <>
-                        <h3 className="font-label-caps text-label-caps text-black/60 mb-sm">Item handed to security</h3>
-                        <p className="font-body-lg text-black leading-relaxed">
-                          This item was turned in to Campus Security. Head to the security office with your student ID to claim it.
-                        </p>
-                      </>
+                      <div className="flex items-start gap-md">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-ink bg-surface-container-lowest">
+                          <span className="material-symbols-outlined text-[20px]">local_police</span>
+                        </span>
+                        <div>
+                          <h3 className="font-label-caps text-label-caps uppercase text-ink">Item handed to security</h3>
+                          <p className="mt-xs font-body-lg text-body-lg font-normal leading-relaxed text-ink">
+                            This item was turned in to Campus Security. Head to the security office with your student ID to claim it.
+                          </p>
+                        </div>
+                      </div>
                     ) : (
                       <>
-                        <h3 className="font-label-caps text-label-caps text-black/60 mb-md">Finder details for meetup</h3>
-                        <div className="flex flex-col gap-sm">
-                          <div className="flex justify-between items-center py-sm border-b border-outline-variant">
-                            <span className="font-label-caps text-label-caps text-black/60">Name</span>
-                            <span className="text-black font-headline-md">{post.reporter_name}</span>
+                        <h3 className="mb-md font-label-caps text-label-caps uppercase text-ink">Finder details for meetup</h3>
+                        <dl className="flex flex-col divide-y-2 divide-ink/10">
+                          <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
+                            <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Name</dt>
+                            <dd className="font-body-lg text-body-lg font-semibold text-ink">{post.reporter_name}</dd>
                           </div>
-                          <div className="flex justify-between items-center py-sm border-b border-outline-variant">
-                            <span className="font-label-caps text-label-caps text-black/60">Messenger Link</span>
-                            <span className="text-black font-headline-md">{post.messenger_link}</span>
+                          <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
+                            <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Messenger Link</dt>
+                            <dd className="min-w-0 max-w-full truncate font-body-lg text-body-lg font-semibold text-ink">
+                              {messengerHref ? (
+                                <a href={messengerHref} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-on-surface-variant">
+                                  {post.messenger_link}
+                                </a>
+                              ) : "Not set"}
+                            </dd>
                           </div>
                           {post.pickup_location && (
-                            <div className="flex justify-between items-center py-sm">
-                              <span className="font-label-caps text-label-caps text-black/60">Pickup Location</span>
-                              <span className="text-black font-headline-md">{post.pickup_location}</span>
+                            <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
+                              <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Pickup Location</dt>
+                              <dd className="font-body-lg text-body-lg font-semibold text-ink">{post.pickup_location}</dd>
                             </div>
                           )}
-                        </div>
+                        </dl>
                       </>
                     )}
                   </div>
                 )}
 
               </div>
-
             </div>
           </div>
         </main>
@@ -237,19 +302,20 @@ function ItemDetail() {
       {lightboxOpen && (
         <div
           onClick={() => setLightboxOpen(false)}
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center cursor-zoom-out p-lg"
+          className="fixed inset-0 z-[70] flex cursor-zoom-out items-center justify-center bg-ink/90 p-lg backdrop-blur-sm"
         >
           <button
+            type="button"
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-lg right-lg text-white"
+            className="absolute right-lg top-lg grid h-11 w-11 place-items-center rounded-full border-2 border-background text-background transition-colors hover:bg-background hover:text-ink"
             aria-label="Close"
           >
-            <span className="material-symbols-outlined text-[32px]">close</span>
+            <span className="material-symbols-outlined">close</span>
           </button>
           <img
             src={post.image_url}
             alt={post.title}
-            className="max-w-full max-h-full object-contain"
+            className="max-h-full max-w-full rounded-2xl object-contain"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

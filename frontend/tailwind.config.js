@@ -1,5 +1,16 @@
 // tailwind.config.js
 
+/*
+  CampusFind palette (4 colors, plus lighter/darker tints of them)
+  ---------------------------------------------------------------
+  paper   #EDEDE8  background
+  ink     #17172E  text, outlines, dark sections
+  lime    #D4F26A  accent 1 (main highlight, buttons, active states)
+  violet  #A58BF0  accent 2 (secondary highlight)
+
+  The only exception is "error" red, kept for delete / danger actions.
+*/
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -9,64 +20,83 @@ export default {
   theme: {
     extend: {
       colors: {
-        "background": "#EEEFE9",
-        "surface": "#EEEFE9",
-        "surface-dim": "#DCDDD4",
-        "surface-bright": "#FFFFFF",
-        "surface-container-lowest": "#FFFFFF",
-        "surface-container-low": "#F4F5EF",
-        "surface-container": "#E7E8E1",
-        "surface-container-high": "#DEDFD6",
-        "surface-container-highest": "#D3D4C9",
+        // ---- the 4 brand colors (use these in new code) ----
+        "paper": "#EDEDE8",
+        "ink": "#17172E",
+        "lime": {
+          DEFAULT: "#D4F26A",
+          soft: "#EEF8C7",
+        },
+        "violet": {
+          DEFAULT: "#A58BF0",
+          soft: "#E4DCFB",
+        },
 
-        "primary": "#252525",
-        "on-primary": "#FFFFFF",
-        "primary-container": "#d7d8d1",
-        "on-primary-container": "#14140F",
-        "primary-fixed": "#E7E8E1",
-        "primary-fixed-dim": "#D3D4C9",
-        "on-primary-fixed": "#14140F",
-        "on-primary-fixed-variant": "#3A3A32",
+        // ---- existing theme names, remapped to the palette ----
+        "background": "#EDEDE8",
+        "surface": "#EDEDE8",
+        "surface-dim": "#DADAD3",
+        "surface-bright": "#F9F9F7",
+        "surface-container-lowest": "#F9F9F7",
+        "surface-container-low": "#F4F4F0",
+        "surface-container": "#E4E4DE",
+        "surface-container-high": "#DADAD3",
+        "surface-container-highest": "#CFCFC7",
 
-        "secondary": "#6B6A5F",
-        "on-secondary": "#FFFFFF",
-        "secondary-container": "#E7E8E1",
-        "on-secondary-container": "#3A3A32",
-        "secondary-fixed": "#E7E8E1",
-        "secondary-fixed-dim": "#C7C8BC",
-        "on-secondary-fixed": "#14140F",
-        "on-secondary-fixed-variant": "#3A3A32",
+        "primary": "#17172E",
+        "on-primary": "#F9F9F7",
+        "primary-container": "#D4F26A",
+        "on-primary-container": "#17172E",
+        "primary-fixed": "#E4DCFB",
+        "primary-fixed-dim": "#C9B8F6",
+        "on-primary-fixed": "#17172E",
+        "on-primary-fixed-variant": "#3A3A55",
 
-        "tertiary": "#8A8879",
-        "on-tertiary": "#FFFFFF",
-        "tertiary-container": "#E7E8E1",
-        "on-tertiary-container": "#4A4940",
-        "tertiary-fixed": "#E7E8E1",
-        "tertiary-fixed-dim": "#C7C8BC",
-        "on-tertiary-fixed": "#14140F",
-        "on-tertiary-fixed-variant": "#4A4940",
+        "secondary": "#5C5C70",
+        "on-secondary": "#F9F9F7",
+        "secondary-container": "#EEF8C7",
+        "on-secondary-container": "#17172E",
+        "secondary-fixed": "#EEF8C7",
+        "secondary-fixed-dim": "#DDEF9C",
+        "on-secondary-fixed": "#17172E",
+        "on-secondary-fixed-variant": "#3A3A55",
 
-        "on-background": "#14140F",
-        "on-surface": "#353534",
-        "on-surface-variant": "#6B6A5F",
-        "outline": "#8A8879",
-        "outline-variant": "#D9DAD1",
+        "tertiary": "#A58BF0",
+        "on-tertiary": "#17172E",
+        "tertiary-container": "#E4DCFB",
+        "on-tertiary-container": "#17172E",
+        "tertiary-fixed": "#E4DCFB",
+        "tertiary-fixed-dim": "#C9B8F6",
+        "on-tertiary-fixed": "#17172E",
+        "on-tertiary-fixed-variant": "#3A3A55",
 
-        "inverse-surface": "#2A2A24",
-        "inverse-on-surface": "#EEEFE9",
-        "inverse-primary": "#D3D4C9",
-        "surface-tint": "#14140F",
+        "on-background": "#17172E",
+        "on-surface": "#17172E",
+        "on-surface-variant": "#5C5C70",
+        "outline": "#8B8B99",
+        "outline-variant": "#D3D3CC",
 
-        "error": "#BA1A1A",
-        "on-error": "#FFFFFF",
-        "error-container": "#FFDAD6",
-        "on-error-container": "#93000A",
+        "inverse-surface": "#17172E",
+        "inverse-on-surface": "#EDEDE8",
+        "inverse-primary": "#D4F26A",
+        "surface-tint": "#17172E",
+
+        "error": "#C2362B",
+        "on-error": "#F9F9F7",
+        "error-container": "#FBE3E0",
+        "on-error-container": "#7A1A13",
       },
       borderRadius: {
         "DEFAULT": "1rem",
         "lg": "2rem",
         "xl": "3rem",
         "full": "9999px"
+      },
+      boxShadow: {
+        // the chunky offset shadow from the mockup
+        "pop-sm": "3px 3px 0 0 #17172E",
+        "pop": "4px 4px 0 0 #17172E",
+        "pop-lg": "6px 6px 0 0 #17172E",
       },
       spacing: {
         "xxl": "48px",
@@ -81,24 +111,27 @@ export default {
         "gutter": "16px"
       },
       fontFamily: {
-        "label-caps": ["Manrope", "sans-serif"],
-        "headline-lg": ["Poppins", "sans-serif"],
-        "body-lg": ["Manrope", "sans-serif"],
-        "button": ["Manrope", "sans-serif"],
-        "body-sm": ["Manrope", "sans-serif"],
-        "headline-md": ["Manrope", "sans-serif"],
-        "headline-lg-mobile": ["Poppins", "sans-serif"],
-        "inter-bold": ["Inter", "sans-serif"],
-        "manrope-light": ["Manrope", "sans-serif"],
+        // headings: Bricolage Grotesque / body: DM Sans
+        "display": ["Bricolage Grotesque", "sans-serif"],
+        "headline-lg": ["Bricolage Grotesque", "sans-serif"],
+        "headline-lg-mobile": ["Bricolage Grotesque", "sans-serif"],
+        "headline-md": ["Bricolage Grotesque", "sans-serif"],
+        "label-caps": ["DM Sans", "sans-serif"],
+        "body-lg": ["DM Sans", "sans-serif"],
+        "body-sm": ["DM Sans", "sans-serif"],
+        "button": ["DM Sans", "sans-serif"],
+        "inter-bold": ["DM Sans", "sans-serif"],
+        "manrope-light": ["DM Sans", "sans-serif"],
+        "sans": ["DM Sans", "sans-serif"],
       },
       fontSize: {
-        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600"}],
-        "headline-lg": ["28px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
-        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "700"}],
+        "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
         "button": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
         "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
-        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
-        "headline-lg-mobile": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+        "headline-md": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "headline-lg-mobile": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
       }
     },
   },

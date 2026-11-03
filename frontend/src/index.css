@@ -4,23 +4,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        @apply bg-background text-on-surface font-sans antialiased;
+    }
+
+    ::selection {
+        @apply bg-lime text-ink;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-ink;
+    }
+}
+
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
-body {
-    background-color: #f7f9ff;
-    font-family: 'Inter', sans-serif;
-}
-.form-card {
-    background: #ffffff;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 10px 40px -10px rgba(0, 6, 19, 0.05);
-}
-.pill-input {
-    transition: all 0.2s ease-in-out;
-}
-.pill-input:focus {
-    outline: none;
-    border: 2px solid #000613;
-    background: #ffffff;
+
+@layer components {
+    /* outlined card with the offset shadow (used by item cards) */
+    .cute-card-shadow {
+        @apply border-2 border-ink rounded-lg overflow-hidden bg-surface-container-lowest shadow-pop-sm;
+    }
+
+    .form-card {
+        @apply bg-surface-container-lowest border-2 border-ink rounded-lg shadow-pop;
+    }
+
+    .pill-input {
+        @apply transition-all duration-200;
+    }
+    .pill-input:focus {
+        @apply outline-none border-2 border-ink bg-surface-container-lowest ring-4 ring-lime/60;
+    }
 }

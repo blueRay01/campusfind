@@ -23,79 +23,123 @@ function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/feed?search=${encodeURIComponent(searchQuery.trim())}`) 
+      navigate(`/feed?search=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
   return (
-    <header className="bg-surface flex justify-between items-center w-full pl-[150px] pr-[120px] min-h-[100px] sticky top-0 z-50 ">
-      {/* Left group — logo + search, close together */}
-      <div className="flex items-center gap-40 flex-1">
-        <span
-          onClick={() => navigate("/feed")}
-          className="font-headline-lg text-headline-lg text-primary cursor-pointer"
-        >
-          CampusFind
-        </span>
+    <header className="sticky top-0 z-50 w-full border-b-2 border-ink bg-background/90 backdrop-blur-md">
+      <div className="flex flex-wrap lg:flex-nowrap items-center gap-x-sm sm:gap-x-md gap-y-sm px-margin-mobile md:px-8 lg:px-margin-desktop py-sm lg:py-0 lg:h-20">
 
-        <form onSubmit={handleSearch} className="flex items-center w-full max-w-3xl">
-          <div className="relative w-4/5">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        {/* Logo */}
+        <button
+          type="button"
+          onClick={() => navigate("/feed")}
+          className="flex items-center gap-sm shrink-0 rounded-full"
+        >
+          <span className="grid place-items-center w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-lime border-2 border-ink">
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              location_on
+            </span>
+          </span>
+          <span className="font-display text-[19px] sm:text-[22px] font-bold tracking-tight text-ink">CampusFind</span>
+        </button>
+
+        {/* Search: full-width second row on mobile, inline on desktop */}
+        <form
+          onSubmit={handleSearch}
+          role="search"
+          className="order-last w-full lg:order-none lg:w-auto lg:flex-1 lg:max-w-xl lg:ml-lg"
+        >
+          <label className="relative block">
+            <span className="sr-only">Search items</span>
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant pointer-events-none">
+              search
+            </span>
             <input
-              className="w-full pl-10 pr-4 py-2 bg-surface rounded-full border border-black focus:ring-2 focus:ring-primary-container text-body-sm font-body-sm"
-              placeholder="Search lost items..."
+              className="w-full h-11 pl-11 pr-4 rounded-full border-2 border-ink bg-surface-container-lowest font-body-sm text-body-sm placeholder:text-on-surface-variant outline-none focus:ring-4 focus:ring-lime/60 transition"
+              placeholder="Search found items..."
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </label>
         </form>
-      </div>
 
-      
-
-      {/* Right — icons */}
-      <div className="flex items-center gap-20 mr-20">
-      {isLoggedIn ? (
-        <>
-          <button className="p-2 hover:bg-surface-container-high transition-colors duration-200 active:opacity-80">
-            <span className="material-symbols-outlined text-[30px]">notifications</span>
-          </button>
-            <div className="relative" ref={dropdownRef}>
+        {/* Right side */}
+        <div className="ml-auto flex items-center gap-xs sm:gap-sm">
+          {isLoggedIn ? (
+            <>
               <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 hover:bg-surface-container-high transition-colors duration-200 active:opacity-80"
-            >
-              <span className="material-symbols-outlined text-[30px]">account_circle</span>
-            </button>
-            {isOpen && (
-              <div className="absolute flex flex-col justify-center bg-background border border-black">
-                <p className="p-2 cursor-pointer" onClick={() => navigate('/profile')}>Profile</p>
-                <p className="p-2 cursor-pointer" onClick={() => {
-                  logout()
-                  navigate('/feed')
-                }
-                 
-                  }>Logout</p>
+                type="button"
+                aria-label="Notifications"
+                className="grid place-items-center w-11 h-11 rounded-full hover:bg-surface-container-high transition-colors active:scale-95"
+              >
+                <span className="material-symbols-outlined text-[26px]">notifications</span>
+              </button>
+
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  aria-label="Account menu"
+                  aria-expanded={isOpen}
+                  onClick={() => setIsOpen(!isOpen)}
+                  className={`grid place-items-center w-11 h-11 rounded-full border-2 transition-colors active:scale-95 ${
+                    isOpen ? "bg-lime border-ink" : "border-transparent hover:bg-surface-container-high"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[26px]">account_circle</span>
+                </button>
+
+                {isOpen && (
+                  <div className="absolute right-0 top-full mt-sm w-48 overflow-hidden rounded-2xl border-2 border-ink bg-surface-container-lowest shadow-pop">
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-sm px-md py-3 text-left font-body-sm text-body-sm hover:bg-lime-soft"
+                      onClick={() => {
+                        setIsOpen(false)
+                        navigate('/profile')
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">person</span>
+                      Profile
+                    </button>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-sm px-md py-3 text-left font-body-sm text-body-sm border-t-2 border-ink/10 hover:bg-lime-soft"
+                      onClick={() => {
+                        setIsOpen(false)
+                        logout()
+                        navigate('/feed')
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">logout</span>
+                      Log out
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          
-        </>
-      ) : (
-        <>
-          <button type="button" className="border border-black text-black-xs px-4 py-2 hover:bg-primary-container" onClick={() => {openAuthModal('register')}}>
-            Sign Up   
-          </button>
-          <button type="button" className="bg-black text-white px-4 py-2 hover:bg-primary" onClick={() => {openAuthModal('login')}}>
-            Log In
-          </button>
-        </>
-      )}
-
-        
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="h-9 px-3 sm:h-10 sm:px-md rounded-full border-2 border-ink font-button font-semibold text-[14px] sm:text-button hover:bg-surface-container-lowest transition-colors"
+                onClick={() => { openAuthModal('register') }}
+              >
+                Sign Up
+              </button>
+              <button
+                type="button"
+                className="h-9 px-3 sm:h-10 sm:px-md rounded-full border-2 border-ink bg-lime font-button font-semibold text-[14px] sm:text-button shadow-pop-sm transition-all hover:-translate-y-0.5 hover:shadow-pop active:translate-y-0 active:shadow-none"
+                onClick={() => { openAuthModal('login') }}
+              >
+                Log In
+              </button>
+            </>
+          )}
+        </div>
       </div>
-
     </header>
   )
 }
