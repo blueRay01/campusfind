@@ -17,8 +17,12 @@ function SideBar() {
   return (
     <>
       {isLoggedIn && (
-        <aside className="sticky top-[90px] z-30 hidden h-[calc(100vh-90px)] w-24 shrink-0 flex-col items-center self-start border-r-2 border-ink bg-background py-lg lg:flex">
-          <nav className="flex flex-col items-center gap-sm" aria-label="Main">
+        <aside className="relative z-30 hidden min-h-[calc(100vh-90px)] w-24 shrink-0 border-r-2 border-ink bg-background lg:-mb-xxl lg:block">
+          {/* Sticks below the navbar; items spread from top edge to bottom edge */}
+          <nav
+            className="sticky top-[90px] flex h-[calc(100vh-90px)] flex-col items-center justify-between py-lg"
+            aria-label="Main"
+          >
             {navItems.map((item) => {
               const isActive = item.matches.some(prefix => location.pathname.startsWith(prefix))
               return (
@@ -43,8 +47,6 @@ function SideBar() {
                 </button>
               )
             })}
-
-            <span className="my-sm h-0.5 w-10 rounded-full bg-ink/15" aria-hidden="true" />
 
             {/* Report button */}
             <button
