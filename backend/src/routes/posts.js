@@ -25,29 +25,48 @@ router.get('/', optionalAuth, async(req,res) => {
 router.get('/my', authMiddleWare, async(req, res) => {
     try {
         const id = req.user.id
-        const post = await pool.query('SELECT * FROM posts WHERE user_id = $1', [id])
-
-        if (post.rows.length === 0) {
-            return res.status(404).json({ message: "No posts"})
-        } else {
-            res.status(200).json(post.rows)
-        }
+        const post = await pool.query('SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC', [id])
+        // An empty list is a normal answer, not an error
+        res.status(200).json(post.rows)
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Server error"})
     }
-})  
+})
 
-router.get('/:id', async(req, res) =>{
+// Anyone can view a post. Contact details (messenger link, pickup spot) are only
+// sent to the owner and to the person who claimed it.
+router.get('/:id', optionalAuth, async(req, res) =>{
     try {
         const { id } = req.params
-        const post = await pool.query('SELECT posts.*, users.name AS reporter_name, users.messenger_link AS messenger_link, users.email AS email FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id = $1', [id])
+        const viewerId = req.user ? req.user.id : null
+
+        const post = await pool.query(
+            `SELECT posts.*, users.name AS reporter_name, users.messenger_link AS messenger_link,
+                    EXISTS (
+                        SELECT 1 FROM claims
+                        WHERE claims.post_id = posts.id AND claims.claimant_id = $2
+                    ) AS claimed_by_me
+             FROM posts JOIN users ON posts.user_id = users.id
+             WHERE posts.id = $1`,
+            [id, viewerId]
+        )
 
         if (post.rows.length === 0) {
             return res.status(404).json({ message: "No posts." });
-        } 
-        res.status(200).json(post.rows[0])
+        }
+
+        const row = post.rows[0]
+        row.is_own_post = viewerId !== null && String(row.user_id) === String(viewerId)
+
+        if (!row.is_own_post && !row.claimed_by_me) {
+            delete row.messenger_link
+            delete row.pickup_location
+        }
+
+        res.status(200).json(row)
     } catch (error) {
+        console.error(error)
         res.status(500).json({ message: "Server error." });
     }
 })

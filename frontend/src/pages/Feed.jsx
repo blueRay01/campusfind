@@ -319,11 +319,9 @@ function Feed() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-xl flex flex-col items-center rounded-[22px] border-2 border-dashed border-ink/30 px-lg py-xxl text-center">
-                  <span className="grid h-16 w-16 place-items-center rounded-2xl border-2 border-ink bg-violet-soft">
-                    <span className="material-symbols-outlined text-[32px]">search_off</span>
-                  </span>
-                  <h3 className="mt-md font-headline-md text-headline-md">Nothing here yet</h3>
+                <div className="flex min-h-[45vh] flex-col items-center justify-center px-lg py-xxl text-center">
+                  <span className="material-symbols-outlined text-[56px] text-ink/25">search_off</span>
+                  <h3 className="mt-md font-headline-md text-headline-md text-ink/70">Nothing here yet</h3>
                   <p className="mt-xs max-w-sm font-body-sm text-body-sm text-on-surface-variant">
                     {searchQuery || activeCategory !== "All Items"
                       ? "Try another category or a different search."

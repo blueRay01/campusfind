@@ -17,10 +17,12 @@ function ItemDetail() {
   const navigate = useNavigate()
   const { isLoggedIn, openAuthModal } = useAuth()
   const { id } = useParams()
-  const [claimed, setClaimed] = useState(false)
+  const [claimed, setClaimed] = useState(false)   // true when *I* claimed it
   const [post, setPost] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [claimError, setClaimError] = useState("")
+  const [claiming, setClaiming] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [descExpanded, setDescExpanded] = useState(false)
 
@@ -31,32 +33,38 @@ function ItemDetail() {
       ? post.description.slice(0, DESCRIPTION_LIMIT).trimEnd() + "…"
       : post.description
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await api.get(`/posts/${id}`)
-        setPost(response.data)
-        setClaimed(response.data.is_claimed)
-      } catch (err) {
-        setError("Failed to load this item. Please try again.")
-      } finally {
-        setLoading(false)
-      }
+  const fetchPost = async () => {
+    try {
+      const response = await api.get(`/posts/${id}`)
+      setPost(response.data)
+      setClaimed(Boolean(response.data.claimed_by_me))
+    } catch (err) {
+      setError("Failed to load this item. Please try again.")
+    } finally {
+      setLoading(false)
     }
+  }
 
+  // Refetch after logging in, so we know if this is your own post or your claim
+  useEffect(() => {
     fetchPost()
-  }, [id])
+  }, [id, isLoggedIn])
 
   const handleClaim = async () => {
+    if (!isLoggedIn) {
+      openAuthModal('login')
+      return
+    }
+    setClaimError("")
+    setClaiming(true)
     try {
-      if (isLoggedIn) {
-        await api.post('/claims', { post_id: id })
-        setClaimed(true)
-      } else {
-        openAuthModal('login')
-      }
+      await api.post('/claims', { post_id: id })
+      setClaimed(true)
+      await fetchPost() // now includes the finder's contact details
     } catch (err) {
-      setError("Failed to claim this item. Please try again.")
+      setClaimError(err.response?.data?.message || "Failed to claim this item. Please try again.")
+    } finally {
+      setClaiming(false)
     }
   }
 
@@ -91,11 +99,22 @@ function ItemDetail() {
     )
   }
 
+  const isOwnPost = Boolean(post.is_own_post)
+  const takenByOther = post.is_claimed && !claimed && !isOwnPost
+
   const status = post.is_resolved
     ? { label: "Resolved", dot: "bg-surface-container-highest" }
-    : claimed
-      ? { label: "Pending Confirmation", dot: "bg-violet" }
-      : { label: "Awaiting Claim", dot: "bg-lime animate-pulse" }
+    : isOwnPost
+      ? post.is_claimed
+        ? { label: "Claimed, waiting for handoff", dot: "bg-violet" }
+        : { label: "Awaiting Claim", dot: "bg-lime animate-pulse" }
+      : claimed
+        ? { label: "Pending Confirmation", dot: "bg-violet" }
+        : takenByOther
+          ? { label: "Already claimed", dot: "bg-surface-container-highest" }
+          : { label: "Awaiting Claim", dot: "bg-lime animate-pulse" }
+
+  const claimDisabled = claimed || takenByOther || post.is_resolved || claiming
 
   // Display only: make the messenger link clickable
   const messengerHref = post.messenger_link
@@ -224,31 +243,70 @@ function ItemDetail() {
                     <span className="font-headline-md text-headline-md text-ink">{status.label}</span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleClaim}
-                    disabled={claimed}
-                    aria-label={claimed ? "Claim request sent" : "Claim this item"}
-                    className={`group/btn mt-lg flex h-14 w-full items-center justify-center gap-sm rounded-full border-2 font-button text-body-lg font-bold transition-all ${
-                      claimed
-                        ? "cursor-not-allowed border-ink/20 bg-surface-container text-on-surface-variant"
-                        : "border-ink bg-lime text-ink shadow-pop hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-y-0 active:shadow-none"
-                    }`}
-                  >
-                    <span
-                      className={`material-symbols-outlined text-[22px] transition-transform duration-200 ${claimed ? "" : "group-hover/btn:-rotate-12"}`}
-                    >
-                      {claimed ? "check_circle" : "front_hand"}
-                    </span>
-                    <span>{claimed ? "Request Sent" : "Claim item"}</span>
-                  </button>
-                  {!isLoggedIn && !claimed && (
-                    <p className="mt-sm text-center font-body-sm text-body-sm text-on-surface-variant">You'll need to log in first.</p>
+                  {isOwnPost ? (
+                    /* Your own post: no claim button */
+                    <div className="mt-lg rounded-2xl border-2 border-ink bg-lime-soft p-md">
+                      <p className="flex items-start gap-sm font-body-lg text-body-lg text-ink">
+                        <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>person_pin</span>
+                        This is your post. You can't claim items you reported.
+                      </p>
+                      <div className="mt-md flex flex-wrap gap-sm">
+                        {!post.is_resolved && (
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/report/${post.id}`)}
+                            className="h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-lg font-button text-button transition-colors hover:bg-lime"
+                          >
+                            Edit post
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => navigate("/my-posts")}
+                          className="h-11 rounded-full border-2 border-ink px-lg font-button text-button transition-colors hover:bg-surface-container-lowest"
+                        >
+                          Go to My Posts
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleClaim}
+                        disabled={claimDisabled}
+                        aria-label={claimed ? "Claim request sent" : "Claim this item"}
+                        className={`group/btn mt-lg flex h-14 w-full items-center justify-center gap-sm rounded-full border-2 font-button text-body-lg font-bold transition-all ${
+                          claimDisabled
+                            ? "cursor-not-allowed border-ink/20 bg-surface-container text-on-surface-variant"
+                            : "border-ink bg-lime text-ink shadow-pop hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-y-0 active:shadow-none"
+                        }`}
+                      >
+                        <span
+                          className={`material-symbols-outlined text-[22px] transition-transform duration-200 ${claimDisabled ? "" : "group-hover/btn:-rotate-12"}`}
+                        >
+                          {claimed ? "check_circle" : takenByOther ? "block" : "front_hand"}
+                        </span>
+                        <span>
+                          {claiming ? "Claiming..." : claimed ? "Request Sent" : takenByOther ? "Already claimed" : "Claim item"}
+                        </span>
+                      </button>
+
+                      {claimError && (
+                        <p role="alert" className="mt-sm flex items-start gap-sm rounded-2xl border-2 border-error bg-error-container px-md py-sm font-body-sm text-body-sm text-on-error-container">
+                          <span className="material-symbols-outlined text-[20px]">error</span>
+                          {claimError}
+                        </p>
+                      )}
+                      {!isLoggedIn && !claimed && (
+                        <p className="mt-sm text-center font-body-sm text-body-sm text-on-surface-variant">You'll need to log in first.</p>
+                      )}
+                    </>
                   )}
                 </div>
 
                 {/* Finder details: appears after claiming */}
-                {claimed && isLoggedIn && (
+                {claimed && isLoggedIn && !isOwnPost && (
                   <div className="mt-lg rounded-[24px] border-2 border-ink bg-violet-soft p-lg">
                     {post.handed_to_security ? (
                       <div className="flex items-start gap-md">

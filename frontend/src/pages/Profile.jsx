@@ -18,10 +18,15 @@ function getDaysUntilNextChange(lastChanged) {
   return Math.max(0, NAME_CHANGE_COOLDOWN_DAYS - daysPassed)
 }
 
+function formatDate(value, options) {
+  if (!value) return ""
+  const date = new Date(value)
+  return isNaN(date) ? "" : date.toLocaleDateString(undefined, options)
+}
+
 function Profile() {
   const navigate = useNavigate()
   const { logout } = useAuth()
-  const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState("")
   const [editingName, setEditingName] = useState(false)
   const [newName, setNewName] = useState("")
@@ -30,6 +35,18 @@ function Profile() {
   const [successMessage, setSuccessMessage] = useState("")
   const [messengerLink, setMessengerLink] = useState('')
   const [editingMessenger, setEditingMessenger] = useState(false)
+
+  // Change password
+  const [passwordOpen, setPasswordOpen] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [passwordError, setPasswordError] = useState("")
+
+  // Delete account
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deletePassword, setDeletePassword] = useState("")
+  const [deleteError, setDeleteError] = useState("")
 
   useEffect(() => {
     const fetchProfile = async() => {
@@ -42,19 +59,24 @@ function Profile() {
 
   const handleMessengerSave = async () => {
     const update = await api.patch('/auth/my', {messenger_link: messengerLink})
-    setUser(prev => ({ ...user, messenger_link: update.data.messenger_link}))
+    setUser(prev => ({ ...prev, messenger_link: update.data.messenger_link}))
   }
 
-  const daysUntilChange = getDaysUntilNextChange(user.lastNameChange)
+  const daysUntilChange = getDaysUntilNextChange(user.name_changed_at)
   const canChangeName = daysUntilChange === 0
 
-  const handleNameSave = () => {
-    if (!newName.trim()) {
+  const handleNameSave = async () => {
+    const trimmed = newName.trim()
+    if (!trimmed) {
       setNameError("Name cannot be empty.")
       return
     }
-    if (newName.trim().length < 2) {
+    if (trimmed.length < 2) {
       setNameError("Name must be at least 2 characters.")
+      return
+    }
+    if (trimmed === user.name) {
+      setEditingName(false)
       return
     }
     if (!canChangeName) {
@@ -62,17 +84,63 @@ function Profile() {
       return
     }
 
-    setUser(prev => ({
-      ...prev,
-      name: newName.trim(),
-      lastNameChange: new Date().toISOString()
-    }))
-    setEditingName(false)
-    setNameError("")
-    triggerSuccess("Display name updated successfully.")
+    try {
+      const response = await api.patch('/auth/my', { name: trimmed })
+      setUser(prev => ({
+        ...prev,
+        name: response.data.name,
+        name_changed_at: response.data.name_changed_at,
+      }))
+      setEditingName(false)
+      setNameError("")
+      triggerSuccess("Display name updated successfully.")
+    } catch (err) {
+      setNameError(err.response?.data?.message || "Couldn't update your name. Try again.")
+    }
   }
 
-  
+  const closePasswordForm = () => {
+    setPasswordOpen(false)
+    setCurrentPassword("")
+    setNewPassword("")
+    setConfirmPassword("")
+    setPasswordError("")
+  }
+
+  const handlePasswordSave = async (e) => {
+    e.preventDefault()
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters.")
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords don't match.")
+      return
+    }
+
+    try {
+      const response = await api.patch('/auth/password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      })
+      setUser(prev => ({ ...prev, password_changed_at: response.data.password_changed_at }))
+      closePasswordForm()
+      triggerSuccess("Password updated successfully.")
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || "Couldn't update your password. Try again.")
+    }
+  }
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault()
+    try {
+      await api.delete('/auth/my', { data: { password: deletePassword } })
+      logout()
+      navigate("/feed")
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || "Couldn't delete your account. Try again.")
+    }
+  }
 
   const triggerSuccess = (message) => {
     setSuccessMessage(message)
@@ -82,6 +150,7 @@ function Profile() {
 
   const card = "rounded-[28px] border-2 border-ink bg-surface-container-lowest p-lg sm:p-xl"
   const smallBtn = "h-10 shrink-0 rounded-full border-2 border-ink px-md font-button text-button transition-colors"
+  const fieldInput = "w-full h-12 rounded-full border-2 border-ink/20 bg-surface-container-low px-lg font-body-lg text-body-lg text-ink outline-none transition-all focus:border-ink focus:bg-surface-container-lowest focus:ring-4 focus:ring-lime/60"
   const inlineInput = "min-w-0 flex-1 basis-full sm:basis-0 h-10 rounded-full border-2 border-ink/20 bg-surface-container-low px-md font-body-lg text-body-lg text-ink outline-none transition-all focus:border-ink focus:bg-surface-container-lowest focus:ring-4 focus:ring-lime/60"
 
   const detailRows = [
@@ -96,7 +165,7 @@ function Profile() {
       <Navbar />
 
       <div className="flex flex-1">
-        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SideBar />
 
         <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:px-12 pt-xl lg:pt-xxl">
           <div className="max-w-[900px]">
@@ -116,13 +185,6 @@ function Profile() {
                 <div className="grid h-24 w-24 select-none place-items-center rounded-full border-2 border-ink bg-lime font-display text-4xl font-bold text-ink">
                   {user?.name?.charAt(0).toUpperCase() || "?"}
                 </div>
-                <button
-                  type="button"
-                  aria-label="Change avatar"
-                  className="absolute bottom-0 right-0 grid h-8 w-8 place-items-center rounded-full border-2 border-ink bg-violet transition-transform hover:scale-110"
-                >
-                  <span className="material-symbols-outlined text-[16px]">edit</span>
-                </button>
               </div>
 
               {/* Name and basic info */}
@@ -179,9 +241,9 @@ function Profile() {
                       {user.course}
                     </span>
                   )}
-                  {user.joinedDate && (
+                  {user.created_at && (
                     <span className="rounded-full border-2 border-ink/20 px-3 py-0.5 font-label-caps text-label-caps uppercase text-on-surface-variant">
-                      Joined {user.joinedDate}
+                      Joined {formatDate(user.created_at, { month: "short", year: "numeric" })}
                     </span>
                   )}
                 </div>
@@ -269,14 +331,64 @@ function Profile() {
             </section>
 
             {/* Password */}
-            <section className={`${card} mb-lg flex flex-col gap-md sm:flex-row sm:items-center sm:justify-between`}>
-              <div>
-                <h3 className="font-headline-md text-headline-md text-ink">Password</h3>
-                <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant">Last changed: Never</p>
+            <section className={`${card} mb-lg`}>
+              <div className="flex flex-col gap-md sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="font-headline-md text-headline-md text-ink">Password</h3>
+                  <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant">
+                    Last changed: {user.password_changed_at ? formatDate(user.password_changed_at, { month: "short", day: "numeric", year: "numeric" }) : "Never"}
+                  </p>
+                </div>
+                {!passwordOpen && (
+                  <button type="button" onClick={() => setPasswordOpen(true)} className={`${smallBtn} self-start hover:bg-violet-soft sm:self-auto`}>
+                    Change Password
+                  </button>
+                )}
               </div>
-              <button type="button" className={`${smallBtn} self-start hover:bg-violet-soft sm:self-auto`}>
-                Change Password
-              </button>
+
+              {passwordOpen && (
+                <form onSubmit={handlePasswordSave} className="mt-lg flex flex-col gap-md border-t-2 border-ink/10 pt-lg">
+                  <input
+                    type="password"
+                    placeholder="Current password"
+                    aria-label="Current password"
+                    autoComplete="current-password"
+                    value={currentPassword}
+                    onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError("") }}
+                    className={fieldInput}
+                    required
+                  />
+                  <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
+                    <input
+                      type="password"
+                      placeholder="New password (8+ characters)"
+                      aria-label="New password"
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => { setNewPassword(e.target.value); setPasswordError("") }}
+                      className={fieldInput}
+                      required
+                    />
+                    <input
+                      type="password"
+                      placeholder="Confirm new password"
+                      aria-label="Confirm new password"
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError("") }}
+                      className={fieldInput}
+                      required
+                    />
+                  </div>
+                  {passwordError && (
+                    <p role="alert" className="font-body-sm text-body-sm text-error">{passwordError}</p>
+                  )}
+                  <div className="flex flex-wrap gap-sm">
+                    <button type="submit" className={`${smallBtn} bg-lime`}>Update Password</button>
+                    <button type="button" onClick={closePasswordForm} className={`${smallBtn} hover:bg-surface-container`}>Cancel</button>
+                  </div>
+                </form>
+              )}
             </section>
 
             {/* Danger zone */}
@@ -294,10 +406,49 @@ function Profile() {
                 >
                   Log Out
                 </button>
-                <button type="button" className={`${smallBtn} border-error bg-error text-on-error hover:opacity-90`}>
-                  Delete Account
-                </button>
+                {!deleteOpen && (
+                  <button
+                    type="button"
+                    onClick={() => setDeleteOpen(true)}
+                    className={`${smallBtn} border-error bg-error text-on-error hover:opacity-90`}
+                  >
+                    Delete Account
+                  </button>
+                )}
               </div>
+
+              {deleteOpen && (
+                <form onSubmit={handleDeleteAccount} className="mt-lg flex flex-col gap-md border-t-2 border-error/20 pt-lg">
+                  <p className="font-body-sm text-body-sm text-on-error-container">
+                    This deletes your account, your posts, and your claims. Enter your password to confirm.
+                  </p>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    aria-label="Password to confirm deletion"
+                    autoComplete="current-password"
+                    value={deletePassword}
+                    onChange={(e) => { setDeletePassword(e.target.value); setDeleteError("") }}
+                    className={fieldInput}
+                    required
+                  />
+                  {deleteError && (
+                    <p role="alert" className="font-body-sm text-body-sm text-error">{deleteError}</p>
+                  )}
+                  <div className="flex flex-wrap gap-sm">
+                    <button type="submit" className={`${smallBtn} border-error bg-error text-on-error hover:opacity-90`}>
+                      Permanently Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setDeleteOpen(false); setDeletePassword(""); setDeleteError("") }}
+                      className={`${smallBtn} bg-surface-container-lowest hover:bg-surface-container-low`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
             </section>
 
           </div>

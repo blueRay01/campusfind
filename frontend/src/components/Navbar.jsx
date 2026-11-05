@@ -29,13 +29,13 @@ function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-ink bg-background/90 backdrop-blur-md">
-      <div className="flex flex-wrap lg:flex-nowrap items-center gap-x-sm sm:gap-x-md gap-y-sm px-margin-mobile md:px-8 lg:px-12 py-sm lg:py-0 lg:h-[88px]">
+      <div className="flex flex-wrap items-center gap-x-sm sm:gap-x-md gap-y-sm px-margin-mobile md:px-8 lg:grid lg:h-[88px] lg:grid-cols-[1fr_minmax(0,680px)_1fr] lg:gap-xl lg:px-12 lg:py-0">
 
         {/* Logo */}
         <button
           type="button"
           onClick={() => navigate("/feed")}
-          className="flex items-center gap-sm shrink-0 rounded-full"
+          className="flex items-center gap-sm shrink-0 rounded-full lg:justify-self-start"
         >
           <span className="grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-lime border-2 border-ink">
             <span className="material-symbols-outlined text-[22px] sm:text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -45,11 +45,11 @@ function Navbar() {
           <span className="font-display text-[21px] sm:text-[26px] font-bold tracking-tight text-ink">CampusFind</span>
         </button>
 
-        {/* Search: full-width second row on mobile, inline on desktop */}
+        {/* Search: full-width second row on mobile, centered on desktop */}
         <form
           onSubmit={handleSearch}
           role="search"
-          className="order-last w-full lg:order-none lg:w-auto lg:flex-1 lg:max-w-2xl lg:ml-xl"
+          className="order-last w-full lg:order-none"
         >
           <label className="relative block">
             <span className="sr-only">Search items</span>
@@ -67,7 +67,7 @@ function Navbar() {
         </form>
 
         {/* Right side */}
-        <div className="ml-auto flex items-center gap-xs sm:gap-sm">
+        <div className="ml-auto flex items-center gap-xs sm:gap-md lg:ml-0 lg:justify-self-end">
           {isLoggedIn ? (
             <>
               <button
