@@ -136,23 +136,31 @@ router.patch('/:id/resolve', authMiddleWare, async(req, res) => {
 })
 
 router.delete('/:id', authMiddleWare, async(req, res) => {
-    const id = req.params.id 
+    const id = req.params.id
     const user_id = req.user.id
 
+    const client = await pool.connect()
     try {
-        const deleted_posts = await pool.query('DELETE FROM posts WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]) 
+        await client.query('BEGIN')
 
-        if (deleted_posts.rows.length === 0) {
+        const owned = await client.query('SELECT id FROM posts WHERE id = $1 AND user_id = $2', [id, user_id])
+        if (owned.rows.length === 0) {
+            await client.query('ROLLBACK')
             return res.status(404).json({ message : "Post not found."})
-        } else {
-            res.status(200).json({ message: "Post deleted successfully."})
         }
-        
+
+        await client.query('DELETE FROM claims WHERE post_id = $1', [id])
+        await client.query('DELETE FROM posts WHERE id = $1 AND user_id = $2', [id, user_id])
+
+        await client.query('COMMIT')
+        res.status(200).json({ message: "Post deleted successfully."})
     } catch (error) {
+        await client.query('ROLLBACK').catch(() => {})
         console.error(error)
         res.status(500).json({ message: "Server error."})
-    } 
-
+    } finally {
+        client.release()
+    }
 })
 
 module.exports = router
