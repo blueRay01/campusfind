@@ -58,7 +58,7 @@ function MyClaims() {
         <SideBar />
 
         <main className="flex-1 min-w-0 px-margin-mobile md:px-8 lg:px-12 pt-xl lg:pt-xxl">
-          <div className="max-w-[1680px]">
+          <div className="mx-auto w-full">
 
             {/* Page header */}
             <div className="mb-xl flex flex-col gap-md md:flex-row md:items-end md:justify-between">

@@ -133,7 +133,7 @@ function Feed() {
         <SideBar />
 
         <main className={`flex-1 min-w-0 ${pagePad} pt-xl lg:pt-xxl`}>
-          <div className="max-w-[1680px]">
+          <div className="mx-auto w-full">
 
             {/* ---------- Landing hero (logged-out visitors only) ---------- */}
             {showLanding && (
