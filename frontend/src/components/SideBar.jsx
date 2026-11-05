@@ -17,10 +17,10 @@ function SideBar() {
   return (
     <>
       {isLoggedIn && (
-        <aside className="relative z-30 hidden min-h-[calc(100vh-90px)] w-24 shrink-0 border-r-2 border-ink bg-background lg:-mb-xxl lg:block">
+        <aside id="app-sidebar" className="relative z-30 hidden w-24 shrink-0 border-r-2 border-ink bg-background lg:block">
           {/* Sticks below the navbar */}
           <nav
-            className="sticky top-[90px] flex h-[calc(100vh-90px)] flex-col items-center py-lg"
+            className="flex h-full flex-col items-center py-lg"
             aria-label="Main"
           >
             {/* Main links, grouped in the middle */}

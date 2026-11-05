@@ -1,6 +1,12 @@
+import { useAuth } from "../context/AuthContext"
+
 function Footer() {
   const links = ["Support", "Legal", "Privacy", "Contact"]
   const year = new Date().getFullYear()
+  const { isLoggedIn } = useAuth()
+
+  // Logged-in pages work like an app: no footer, only the content scrolls
+  if (isLoggedIn) return null
 
   return (
     <footer className="relative z-10 mt-xxl border-t-2 border-ink bg-background px-margin-mobile md:px-8 lg:px-12 pt-xl pb-32 lg:pb-lg overflow-hidden">

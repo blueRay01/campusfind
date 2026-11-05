@@ -39,3 +39,26 @@
         @apply outline-none border-2 border-ink bg-surface-container-lowest ring-4 ring-lime/60;
     }
 }
+
+/*
+  App layout for logged-in users.
+  The sidebar (#app-sidebar) only exists when logged in, so pages that have it
+  lock to the screen height: the navbar and sidebar stay put and only <main> scrolls.
+*/
+#root > div:has(#app-sidebar) main {
+    padding-bottom: 7rem; /* room for the phone bottom nav */
+}
+
+@media (min-width: 1024px) {
+    #root > div:has(#app-sidebar) {
+        height: 100dvh;
+        overflow: hidden;
+    }
+    #root > div:has(#app-sidebar) > div:has(> #app-sidebar) {
+        min-height: 0;
+    }
+    #root > div:has(#app-sidebar) main {
+        overflow-y: auto;
+        padding-bottom: 48px;
+    }
+}
