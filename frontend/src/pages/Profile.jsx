@@ -6,8 +6,8 @@ import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
 import { useAuth } from "../context/AuthContext"
+import { useToast } from "../context/ToastContext"
 // Name can only be changed once every 30 days
-
 
 const NAME_CHANGE_COOLDOWN_DAYS = 30
 
@@ -27,14 +27,14 @@ function formatDate(value, options) {
 function Profile() {
   const navigate = useNavigate()
   const { logout } = useAuth()
+  const toast = useToast()
   const [user, setUser] = useState("")
   const [editingName, setEditingName] = useState(false)
   const [newName, setNewName] = useState("")
   const [nameError, setNameError] = useState("")
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [successMessage, setSuccessMessage] = useState("")
   const [messengerLink, setMessengerLink] = useState('')
   const [editingMessenger, setEditingMessenger] = useState(false)
+  const [contactError, setContactError] = useState("")
 
   // Change password
   const [passwordOpen, setPasswordOpen] = useState(false)
@@ -57,9 +57,17 @@ function Profile() {
     fetchProfile()
   }, [])
 
+  // Contact = phone number or Facebook/Messenger link (any text)
   const handleMessengerSave = async () => {
-    const update = await api.patch('/auth/my', {messenger_link: messengerLink})
-    setUser(prev => ({ ...prev, messenger_link: update.data.messenger_link}))
+    try {
+      const update = await api.patch('/auth/my', { messenger_link: messengerLink.trim() })
+      setUser(prev => ({ ...prev, messenger_link: update.data.messenger_link }))
+      setEditingMessenger(false)
+      setContactError("")
+      toast("Contact updated successfully.")
+    } catch (err) {
+      setContactError(err.response?.data?.message || "Couldn't update your contact. Try again.")
+    }
   }
 
   const daysUntilChange = getDaysUntilNextChange(user.name_changed_at)
@@ -93,7 +101,7 @@ function Profile() {
       }))
       setEditingName(false)
       setNameError("")
-      triggerSuccess("Display name updated successfully.")
+      toast("Display name updated.")
     } catch (err) {
       setNameError(err.response?.data?.message || "Couldn't update your name. Try again.")
     }
@@ -125,7 +133,7 @@ function Profile() {
       })
       setUser(prev => ({ ...prev, password_changed_at: response.data.password_changed_at }))
       closePasswordForm()
-      triggerSuccess("Password updated successfully.")
+      toast("Password updated.")
     } catch (err) {
       setPasswordError(err.response?.data?.message || "Couldn't update your password. Try again.")
     }
@@ -137,15 +145,10 @@ function Profile() {
       await api.delete('/auth/my', { data: { password: deletePassword } })
       logout()
       navigate("/feed")
+      toast("Your account has been deleted.", "info") 
     } catch (err) {
       setDeleteError(err.response?.data?.message || "Couldn't delete your account. Try again.")
     }
-  }
-
-  const triggerSuccess = (message) => {
-    setSuccessMessage(message)
-    setShowSuccess(true)
-    setTimeout(() => setShowSuccess(false), 3500)
   }
 
   const card = "rounded-[28px] border-2 border-ink bg-surface-container-lowest p-lg sm:p-xl"
@@ -270,28 +273,25 @@ function Profile() {
 
                 <div className="flex items-start gap-md rounded-2xl bg-surface-container-low p-md">
                   <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border-2 border-ink bg-surface-container-lowest">
-                    <span className="material-symbols-outlined text-[20px] text-ink">link</span>
+                    <span className="material-symbols-outlined text-[20px] text-ink">contact_phone</span>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">Facebook Link</p>
+                    <p className="font-label-caps text-label-caps uppercase text-on-surface-variant">Contact</p>
 
                     {editingMessenger ? (
                       <div className="mt-xs flex flex-wrap gap-sm">
                         <input
                           type="text"
                           value={messengerLink}
-                          aria-label="Facebook link"
-                          onChange={(e) => setMessengerLink(e.target.value)}
+                          placeholder="Phone number or Facebook link"
+                          aria-label="Contact"
+                          onChange={(e) => { setMessengerLink(e.target.value); setContactError("") }}
                           className={inlineInput}
                           autoFocus
                         />
                         <button
                           type="button"
-                          onClick={async () => {
-                            await handleMessengerSave()
-                            setEditingMessenger(false)
-                            triggerSuccess("Facebook link updated successfully.")
-                          }}
+                          onClick={handleMessengerSave}
                           className={`${smallBtn} bg-lime`}
                         >
                           Save
@@ -299,8 +299,9 @@ function Profile() {
                         <button
                           type="button"
                           onClick={() => {
-                            setMessengerLink(user.messenger_link)
+                            setMessengerLink(user.messenger_link || "")
                             setEditingMessenger(false)
+                            setContactError("")
                           }}
                           className={`${smallBtn} hover:bg-surface-container`}
                         >
@@ -313,17 +314,22 @@ function Profile() {
                         <button
                           type="button"
                           onClick={() =>
-                            { setMessengerLink(user.messenger_link)
+                            { setMessengerLink(user.messenger_link || "")
                               setEditingMessenger(true)}}
                           className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-ink"
-                          title="Edit Facebook link"
-                          aria-label="Edit Facebook link"
+                          title="Edit contact"
+                          aria-label="Edit contact"
                         >
                           <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                       </div>
                     )}
-                    <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant/80">So finders and owners can message you.</p>
+                    {contactError && (
+                      <p role="alert" className="mt-xs font-body-sm text-body-sm text-error">{contactError}</p>
+                    )}
+                    <p className="mt-xs font-body-sm text-body-sm text-on-surface-variant/80">
+                      Phone number or Facebook link, so finders and owners can reach you.
+                    </p>
                   </div>
                 </div>
 
@@ -401,7 +407,7 @@ function Profile() {
               <div className="flex flex-col gap-sm sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => { logout(); navigate("/feed") }}
+                  onClick={() => { logout(); navigate("/feed"); toast("Logged out.", "info") }}
                   className={`${smallBtn} bg-surface-container-lowest hover:bg-surface-container-low`}
                 >
                   Log Out
@@ -454,17 +460,6 @@ function Profile() {
           </div>
         </main>
       </div>
-
-      {/* Success toast (sits above the bottom nav and + button on phones) */}
-      {showSuccess && (
-        <div
-          role="status"
-          className="fixed left-1/2 z-[55] flex -translate-x-1/2 items-center gap-sm whitespace-nowrap rounded-full border-2 border-ink bg-lime px-lg py-sm text-ink shadow-pop bottom-[calc(160px+env(safe-area-inset-bottom))] lg:left-auto lg:right-lg lg:bottom-lg lg:translate-x-0"
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-          <span className="font-button text-button">{successMessage}</span>
-        </div>
-      )}
 
       <Footer />
       <BottomNav />

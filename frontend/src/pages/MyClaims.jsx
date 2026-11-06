@@ -5,9 +5,11 @@ import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
+import { useToast } from "../context/ToastContext"
 
 function MyClaims() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [claims, setClaims] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -18,8 +20,10 @@ function MyClaims() {
   try {
     await api.delete(`/claims/${claimId}`)
     setClaims(claims.filter(claim => claim.claim_id !== claimId))
+    toast("Claim canceled.")
   } catch (err) {
     console.error(err)
+    toast(err.response?.data?.message || "Couldn't cancel this claim. Try again.", "error")
   }
 }
   useEffect(() => {

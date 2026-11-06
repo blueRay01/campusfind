@@ -5,11 +5,14 @@ import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
+import { useToast } from "../context/ToastContext"
 
 function MyPosts() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [activeTab, setActiveTab] = useState("Active")
   const [posts, setPosts] = useState([]);
+  
 
   const handleResolve = async (postId) => {
     try {
@@ -17,8 +20,10 @@ function MyPosts() {
       setPosts(posts.map(post => 
         post.id === postId ? {...post, is_resolved: true} : post
       ))
+      toast("Handoff confirmed. Item marked as resolved.")
     } catch (err) {
       console.error(err)
+      toast(err.response?.data?.message || "Couldn't confirm the handoff. Try again.", "error")
     }
   }
 
@@ -29,8 +34,10 @@ function MyPosts() {
   try {
     await api.delete(`/posts/${postId}`)
     setPosts(posts.filter(post => post.id !== postId))
+    toast("Post deleted.")
   } catch (err) {
     console.error(err)
+    toast(err.response?.data?.message || "Couldn't delete this post. Try again.", "error")
   }
 }
 

@@ -6,6 +6,7 @@ import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
 import { useAuth } from "../context/AuthContext"
+import { useToast } from "../context/ToastContext"
 
 function formatDate(dateString) {
   if (!dateString) return ""
@@ -15,6 +16,7 @@ function formatDate(dateString) {
 
 function ItemDetail() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { isLoggedIn, openAuthModal } = useAuth()
   const { id } = useParams()
   const [claimed, setClaimed] = useState(false)   // true when *I* claimed it
@@ -25,6 +27,7 @@ function ItemDetail() {
   const [claiming, setClaiming] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [descExpanded, setDescExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const DESCRIPTION_LIMIT = 220
   const isLongDescription = post.description && post.description.length > DESCRIPTION_LIMIT
@@ -60,7 +63,8 @@ function ItemDetail() {
     try {
       await api.post('/claims', { post_id: id })
       setClaimed(true)
-      await fetchPost() // now includes the finder's contact details
+      await fetchPost()
+      toast("Claim sent! Contact the finder to arrange pickup.")
     } catch (err) {
       setClaimError(err.response?.data?.message || "Failed to claim this item. Please try again.")
     } finally {
@@ -116,10 +120,23 @@ function ItemDetail() {
 
   const claimDisabled = claimed || takenByOther || post.is_resolved || claiming
 
-  // Display only: make the messenger link clickable
-  const messengerHref = post.messenger_link
-    ? (post.messenger_link.startsWith("http") ? post.messenger_link : `https://${post.messenger_link}`)
-    : null
+  // Copy the finder's contact (phone number or link) to the clipboard
+  const handleCopyContact = async () => {
+    const text = post.messenger_link
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      // Fallback for browsers that block the clipboard API
+      const temp = document.createElement("textarea")
+      temp.value = text
+      document.body.appendChild(temp)
+      temp.select()
+      document.execCommand("copy")
+      document.body.removeChild(temp)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip bg-background text-on-surface">
@@ -329,13 +346,26 @@ function ItemDetail() {
                             <dd className="font-body-lg text-body-lg font-semibold text-ink">{post.reporter_name}</dd>
                           </div>
                           <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
-                            <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Messenger Link</dt>
-                            <dd className="min-w-0 max-w-full truncate font-body-lg text-body-lg font-semibold text-ink">
-                              {messengerHref ? (
-                                <a href={messengerHref} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-on-surface-variant">
-                                  {post.messenger_link}
-                                </a>
-                              ) : "Not set"}
+                            <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Contact</dt>
+                            <dd className="flex min-w-0 max-w-full items-center gap-sm">
+                              {post.messenger_link ? (
+                                <>
+                                  <span className="min-w-0 truncate font-body-lg text-body-lg font-semibold text-ink">{post.messenger_link}</span>
+                                  <button
+                                    type="button"
+                                    onClick={handleCopyContact}
+                                    aria-label="Copy contact"
+                                    className={`inline-flex h-9 shrink-0 items-center gap-1 rounded-full border-2 border-ink px-3 font-button text-[13px] font-semibold transition-colors ${
+                                      copied ? "bg-lime" : "bg-surface-container-lowest hover:bg-lime-soft"
+                                    }`}
+                                  >
+                                    <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "content_copy"}</span>
+                                    {copied ? "Copied" : "Copy"}
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="font-body-lg text-body-lg font-semibold text-ink">Not set</span>
+                              )}
                             </dd>
                           </div>
                           {post.pickup_location && (

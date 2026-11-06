@@ -5,6 +5,7 @@ import SideBar from "../components/SideBar"
 import BottomNav from "../components/BottomNav"
 import Footer from "../components/Footer"
 import api from "../api/axios"
+import { useToast } from "../context/ToastContext"
 
 const buildings = [
   "BLDG. 1 - Arts and Culture Building",
@@ -51,6 +52,7 @@ const categories = [
 
 function ReportItem() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { id } = useParams();
   const isEditMode = Boolean(id)
   const [preview, setPreview] = useState(null);
@@ -142,6 +144,7 @@ function ReportItem() {
         await api.post('/posts', formData)
       }
       navigate('/my-posts')
+      toast(isEditMode ? "Changes saved." : "Item reported. Thanks for helping out!")
     } catch (error) {
       setError(isEditMode ? 'Failed to update item. Please try again' : 'Failed to report item. Please try again')
     }

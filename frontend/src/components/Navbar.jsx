@@ -111,6 +111,7 @@ function Navbar() {
                         setIsOpen(false)
                         logout()
                         navigate('/feed')
+                        toast("Logged out.", "info")
                       }}
                     >
                       <span className="material-symbols-outlined text-[20px]">logout</span>

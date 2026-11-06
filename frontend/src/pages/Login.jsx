@@ -20,6 +20,7 @@ function Login() {
         try {
             const response = await api.post('/auth/login', {email, password})
             login(response.data.token)
+            toast("Welcome back!")
             navigate('/feed')
         } catch (error) {
             setError(error.response?.data?.message || 'Something went wrong. Try again.')
