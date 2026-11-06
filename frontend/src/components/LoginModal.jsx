@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from "../api/axios"
+import { useToast } from '../context/ToastContext'
 
 const cardClass =
     "relative w-full max-w-[460px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface-container-lowest border-2 border-ink rounded-[28px] shadow-pop-lg p-lg sm:p-xl"
@@ -12,6 +13,7 @@ const linkClass = "text-ink font-bold underline-offset-4 hover:underline"
 
 function LoginModal() {
     const { login, authMode, openAuthModal, closeAuthModal } = useAuth()
+    const toast = useToast();
     const [userName, setUserName] = useState('')
     const [studentId, setStudentId] = useState('')
     const [course, setCourse] = useState('')
