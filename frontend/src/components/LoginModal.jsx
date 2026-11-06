@@ -28,6 +28,7 @@ function LoginModal() {
         try {
             const response = await api.post('/auth/login', { email, password})
             login(response.data.token)
+            toast("Welcome back!")
         } catch (error) {
             setError(error.response?.data?.message || 'Something went wrong. Try again')
         }
