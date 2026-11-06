@@ -60,8 +60,8 @@ function Profile() {
   // Contact = phone number or Facebook/Messenger link (any text)
   const handleMessengerSave = async () => {
     try {
-      const update = await api.patch('/auth/my', { messenger_link: messengerLink.trim() })
-      setUser(prev => ({ ...prev, messenger_link: update.data.messenger_link }))
+      const update = await api.patch('/auth/my', { contact: messengerLink.trim() })
+      setUser(prev => ({ ...prev, contact: update.data.contact }))
       setEditingMessenger(false)
       setContactError("")
       toast("Contact updated successfully.")
@@ -299,7 +299,7 @@ function Profile() {
                         <button
                           type="button"
                           onClick={() => {
-                            setMessengerLink(user.messenger_link || "")
+                            setMessengerLink(user.contact || "")
                             setEditingMessenger(false)
                             setContactError("")
                           }}
@@ -310,11 +310,11 @@ function Profile() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-sm">
-                        <p className="min-w-0 truncate font-body-lg text-body-lg text-ink">{user.messenger_link || "Not set"}</p>
+                        <p className="min-w-0 truncate font-body-lg text-body-lg text-ink">{user.contact || "Not set"}</p>
                         <button
                           type="button"
                           onClick={() =>
-                            { setMessengerLink(user.messenger_link || "")
+                            { setMessengerLink(user.contact || "")
                               setEditingMessenger(true)}}
                           className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-ink"
                           title="Edit contact"

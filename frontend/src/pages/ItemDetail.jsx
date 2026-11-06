@@ -122,7 +122,7 @@ function ItemDetail() {
 
   // Copy the finder's contact (phone number or link) to the clipboard
   const handleCopyContact = async () => {
-    const text = post.messenger_link
+    const text = post.contact
     try {
       await navigator.clipboard.writeText(text)
     } catch {
@@ -348,9 +348,9 @@ function ItemDetail() {
                           <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
                             <dt className="font-label-caps text-label-caps uppercase text-on-surface-variant">Contact</dt>
                             <dd className="flex min-w-0 max-w-full items-center gap-sm">
-                              {post.messenger_link ? (
+                              {post.contact ? (
                                 <>
-                                  <span className="min-w-0 truncate font-body-lg text-body-lg font-semibold text-ink">{post.messenger_link}</span>
+                                  <span className="min-w-0 truncate font-body-lg text-body-lg font-semibold text-ink">{post.contact}</span>
                                   <button
                                     type="button"
                                     onClick={handleCopyContact}

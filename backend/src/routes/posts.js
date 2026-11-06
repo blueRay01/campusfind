@@ -42,7 +42,7 @@ router.get('/:id', optionalAuth, async(req, res) =>{
         const viewerId = req.user ? req.user.id : null
 
         const post = await pool.query(
-            `SELECT posts.*, users.name AS reporter_name, users.messenger_link AS messenger_link,
+            `SELECT posts.*, users.name AS reporter_name, users.contact AS contact,
                     EXISTS (
                         SELECT 1 FROM claims
                         WHERE claims.post_id = posts.id AND claims.claimant_id = $2
@@ -60,7 +60,7 @@ router.get('/:id', optionalAuth, async(req, res) =>{
         row.is_own_post = viewerId !== null && String(row.user_id) === String(viewerId)
 
         if (!row.is_own_post && !row.claimed_by_me) {
-            delete row.messenger_link
+            delete row.contact
             delete row.pickup_location
         }
 

@@ -13,7 +13,7 @@ router.get('/my', authMiddleWare, async (req, res) => {
     try {
         const id = req.user.id
         const user = await pool.query(
-            `SELECT id, name, student_id, email, course, created_at, messenger_link,
+            `SELECT id, name, student_id, email, course, created_at, contact,
                     name_changed_at, password_changed_at
              FROM users WHERE id = $1`,
             [id]
@@ -93,7 +93,7 @@ router.post('/login', async(req, res) => {
 router.patch('/my', authMiddleWare, async(req, res) => {
     try {
         const id = req.user.id
-        const { messenger_link } = req.body
+        const { contact } = req.body
         let name = req.body.name
 
         const current = await pool.query('SELECT name, name_changed_at FROM users WHERE id = $1', [id])
@@ -119,12 +119,12 @@ router.patch('/my', authMiddleWare, async(req, res) => {
 
         const user = await pool.query(
             `UPDATE users
-             SET messenger_link = COALESCE($1::text, messenger_link),
+             SET contact = COALESCE($1::text, contact),
                  name = COALESCE($2::text, name),
                  name_changed_at = CASE WHEN $2::text IS NOT NULL THEN NOW() ELSE name_changed_at END
              WHERE id = $3
-             RETURNING name, messenger_link, name_changed_at`,
-            [messenger_link === undefined ? null : messenger_link, name === undefined ? null : name, id]
+             RETURNING name, contact, name_changed_at`,
+            [contact === undefined ? null : contact, name === undefined ? null : name, id]
         )
 
         res.status(200).json(user.rows[0])
